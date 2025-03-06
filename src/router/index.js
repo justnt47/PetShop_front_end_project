@@ -1,7 +1,7 @@
 import { onMounted } from "vue";
 import { createRouter, createWebHistory, useRouter } from 'vue-router';
-import Login from '../components/Login/LoginLayout.vue';
-import HomePage from '../components/HomePage.vue';
+import Login from '../page/Login/page.vue';
+import HomePage from '../page/Home/page.vue';
 import MainLayout from "../MainLayout.vue";
 
 const routes = [
