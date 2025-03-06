@@ -1,5 +1,12 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav
+    :class="[
+      'navbar',
+      'navbar-expand-lg',
+      'bg-white',
+      { 'sticky-top': isSticky, 'navbar-transparent': isTransparent },
+    ]"
+  >
     <div class="container-fluid">
       <button
         class="navbar-toggler"
@@ -19,18 +26,16 @@
         <ul class="navbar-nav">
           <li class="nav-item">
             <router-link :to="{ name: 'HomePage' }" class="nav-link">
-              LOGO</router-link
-            >
+              LOGO
+            </router-link>
           </li>
           <li class="nav-item">
             <router-link :to="{ name: 'HomePage' }" class="nav-link">
-              Home</router-link
-            >
+              Home
+            </router-link>
           </li>
           <li class="nav-item">
-            <router-link :to="{ name: 'HomePage' }" class="nav-link">
-              Home</router-link
-            >
+            <router-link :to="{ name: '' }" class="nav-link"> Home</router-link>
           </li>
           <!-- Add more nav items here -->
         </ul>
@@ -56,15 +61,14 @@
               </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
-                <router-link :to="{ name: '' }" class="dropdown-item"
-                  >Profile</router-link
-                >
+                <router-link :to="{ name: '' }" class="dropdown-item">
+                  Profile
+                </router-link>
               </li>
-
               <li>
-                <router-link :to="{ name: 'Login' }" class="dropdown-item"
-                  >Login</router-link
-                >
+                <router-link :to="{ name: 'Login' }" class="dropdown-item">
+                  Login
+                </router-link>
               </li>
             </ul>
           </li>
@@ -75,34 +79,50 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { Dropdown } from "bootstrap";
 
 const user = ref({ name: "John Doe", email: "john.doe@example.com" });
 
 const isNavbarOpen = ref(false);
+const isSticky = ref(false);
+const isTransparent = ref(false);
 
 const toggleNavbar = () => {
   isNavbarOpen.value = !isNavbarOpen.value;
 };
 
+const handleScroll = () => {
+  if (window.scrollY > 2) {
+    isSticky.value = true;
+    isTransparent.value = true;
+  } else {
+    isSticky.value = false;
+    isTransparent.value = false;
+  }
+};
+
 onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
   const dropdownElement = document.getElementById("accountDropdown");
   if (dropdownElement) {
     new Dropdown(dropdownElement); // Enable Bootstrap dropdown functionality
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
 <style scoped>
 /* Navbar Styling */
 .navbar-nav .nav-link {
-  color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
   transition: background-color 0.3s, color 0.3s;
 }
 .navbar-nav .nav-link:hover {
-  color: #ffffff;
+  color: #000000;
   /* background: rgba(255, 255, 255, 0.2); */
 }
 .navbar-nav .nav-item > .router-link-active {
@@ -114,6 +134,9 @@ onMounted(() => {
   text-decoration: none;
   font-weight: normal;
 }
+
+.navbar-transparent {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  transition: background-color 0.3s;
+}
 </style>
-
-
