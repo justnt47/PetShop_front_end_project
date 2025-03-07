@@ -2,6 +2,7 @@ import { onMounted } from "vue";
 import { createRouter, createWebHistory, useRouter } from 'vue-router';
 import Login from '../page/Login/page.vue';
 import HomePage from '../page/Home/page.vue';
+import ProductPage from '../page/Product/page.vue';
 import MainLayout from "../MainLayout.vue";
 
 const routes = [
@@ -28,6 +29,11 @@ const routes = [
         path: '/',
         name:'HomePage',
         component: HomePage 
+      },
+      { 
+        path: '/Products',
+        name:'ProductPage',
+        component: ProductPage 
       },
       
     ]

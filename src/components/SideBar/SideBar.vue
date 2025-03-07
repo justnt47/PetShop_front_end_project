@@ -8,81 +8,118 @@
     ]"
   >
     <div class="container-fluid">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasNavbar"
+        aria-controls="offcanvasNavbar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
       <router-link :to="{ name: 'HomePage' }" class="navbar-brand">
         <img src="@/assets/KuLogo.png" alt="Logo" class="nav-logo" />
       </router-link>
 
-      <button
-        class="navbar-toggler"
-        type="button"
-        @click="toggleNavbar"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <div class="d-flex align-items-center">
+        <router-link
+          :to="{ name: '' }"
+          class="nav-link position-relative d-lg-none"
+        >
+          <i class="bi bi-cart fs-4"></i>
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          >
+            12
+            <span class="visually-hidden">unread messages</span>
+          </span>
+        </router-link>
+      </div>
+
       <div
-        class="collapse navbar-collapse"
-        :class="{ show: isNavbarOpen }"
-        id="navbarNav"
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="offcanvasNavbar"
+        aria-labelledby="offcanvasNavbarLabel"
       >
-        <ul class="navbar-nav mx-auto fs-5 fw-bold">
-          <li class="nav-item">
-            <router-link :to="{ name: 'HomePage' }" class="nav-link">
-              Home
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <router-link :to="{ name: '' }" class="nav-link"> Home</router-link>
-          </li>
-          <!-- Add more nav items here -->
-        </ul>
-        <ul class="navbar-nav gap-2">
-          <li class="nav-item position-relative">
-            <router-link :to="{ name: '' }" class="nav-link">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">KU Pet Shop</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav mx-auto fs-5 fw-bold">
+            <li class="nav-item">
+              <router-link
+                :to="{ name: 'HomePage' }"
+                class="nav-link"
+                exact-path
+              >
+                HOME
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link
+                :to="{ name: 'ProductPage' }"
+                class="nav-link"
+                exact-path
+              >
+                PRODUCT
+              </router-link>
+            </li>
+            <!-- Add more nav items here -->
+          </ul>
+          <div class="d-flex align-items-center gap-3">
+            <router-link
+              :to="{ name: '' }"
+              class="nav-link position-relative d-lg-block d-none"
+            >
               <i class="bi bi-cart fs-4"></i>
               <span
-                class="position-absolute top-10 start-100 translate-middle badge rounded-pill bg-danger"
+                class="position-absolute start-100 translate-middle badge rounded-pill bg-danger"
               >
                 12
                 <span class="visually-hidden">unread messages</span>
               </span>
             </router-link>
-          </li>
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              id="accountDropdown"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <i class="bi bi-person-circle fs-4"></i> TEST {{ user.name }}
-            </a>
-            <ul
-              class="dropdown-menu dropdown-menu-end"
-              aria-labelledby="accountDropdown"
-            >
-              <li class="dropdown-header">
-                <strong>{{ user.name }}</strong> <br />
-                <small class="text-muted">{{ user.email }}</small>
-              </li>
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <router-link :to="{ name: '' }" class="dropdown-item">
-                  Profile
-                </router-link>
-              </li>
-              <li>
-                <router-link :to="{ name: 'Login' }" class="dropdown-item">
-                  Login
-                </router-link>
-              </li>
-            </ul>
-          </li>
-        </ul>
+            <div class="dropdown my-auto d-lg-block d-none">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="accountDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-person-circle fs-4"></i> TEST {{ user.name }}
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="accountDropdown"
+              >
+                <li class="dropdown-header">
+                  <strong>{{ user.name }}</strong> <br />
+                  <small class="text-muted">{{ user.email }}</small>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <router-link :to="{ name: '' }" class="dropdown-item">
+                    Profile
+                  </router-link>
+                </li>
+                <li>
+                  <router-link :to="{ name: 'Login' }" class="dropdown-item">
+                    Login
+                  </router-link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -94,13 +131,8 @@ import { Dropdown } from "bootstrap";
 
 const user = ref({ name: "John Doe", email: "john.doe@example.com" });
 
-const isNavbarOpen = ref(false);
 const isSticky = ref(false);
 const isTransparent = ref(false);
-
-const toggleNavbar = () => {
-  isNavbarOpen.value = !isNavbarOpen.value;
-};
 
 const handleScroll = () => {
   if (window.scrollY > 2) {
@@ -133,12 +165,15 @@ onUnmounted(() => {
 }
 .navbar-nav .nav-link:hover {
   color: #000000;
-  /* background: rgba(255, 255, 255, 0.2); */
-}
-/* .navbar-nav .nav-item > .router-link-active {
   text-decoration: underline;
-  font-weight: bold;
-} */
+}
+.navbar-nav .nav-item > .router-link-exact-active {
+  text-decoration: underline;
+}
+.navbar-nav .nav-item > .router-link-exact-active:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
 
 .navbar-nav .dropdown-menu .router-link-active {
   text-decoration: none;
