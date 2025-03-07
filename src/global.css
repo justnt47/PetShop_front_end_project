@@ -42,8 +42,6 @@ a {
 
 .background-gradient {
     background: linear-gradient(to right, #4cc244, #7bddfe);
-    height: 100vh;
-    display: flex;
     justify-content: center;
     align-items: center;
     margin: 0;

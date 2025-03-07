@@ -8,6 +8,10 @@
     ]"
   >
     <div class="container-fluid">
+      <router-link :to="{ name: 'HomePage' }" class="navbar-brand">
+        <img src="@/assets/KuLogo.png" alt="Logo" class="nav-logo" />
+      </router-link>
+
       <button
         class="navbar-toggler"
         type="button"
@@ -23,12 +27,7 @@
         :class="{ show: isNavbarOpen }"
         id="navbarNav"
       >
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <router-link :to="{ name: 'HomePage' }" class="nav-link">
-              LOGO
-            </router-link>
-          </li>
+        <ul class="navbar-nav mx-auto fs-5 fw-bold">
           <li class="nav-item">
             <router-link :to="{ name: 'HomePage' }" class="nav-link">
               Home
@@ -39,7 +38,18 @@
           </li>
           <!-- Add more nav items here -->
         </ul>
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav gap-2">
+          <li class="nav-item position-relative">
+            <router-link :to="{ name: '' }" class="nav-link">
+              <i class="bi bi-cart fs-4"></i>
+              <span
+                class="position-absolute top-10 start-100 translate-middle badge rounded-pill bg-danger"
+              >
+                12
+                <span class="visually-hidden">unread messages</span>
+              </span>
+            </router-link>
+          </li>
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -49,7 +59,7 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <i class="fas fa-user"></i> Account
+              <i class="bi bi-person-circle fs-4"></i> TEST {{ user.name }}
             </a>
             <ul
               class="dropdown-menu dropdown-menu-end"
@@ -125,10 +135,10 @@ onUnmounted(() => {
   color: #000000;
   /* background: rgba(255, 255, 255, 0.2); */
 }
-.navbar-nav .nav-item > .router-link-active {
+/* .navbar-nav .nav-item > .router-link-active {
   text-decoration: underline;
   font-weight: bold;
-}
+} */
 
 .navbar-nav .dropdown-menu .router-link-active {
   text-decoration: none;
@@ -138,5 +148,10 @@ onUnmounted(() => {
 .navbar-transparent {
   background-color: rgba(255, 255, 255, 0.8) !important;
   transition: background-color 0.3s;
+}
+
+.nav-logo {
+  width: 50px;
+  height: 50px;
 }
 </style>

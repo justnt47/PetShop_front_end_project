@@ -1,36 +1,88 @@
 <template>
   <div class="background-gradient">
-    <div
-      class="container d-flex justify-content-center align-items-center vh-100"
-    >
-      <div class="row w-100">
-        <div class="col-lg-4 col-md-8 mx-auto">
-          <div class="hello card text-center">
-            <div class="card-body">
-              <h1 class="card-title">Hello, World!</h1>
-              <p class="card-text">
-                Welcome to your Vue.js app with Bootstrap styling.
-              </p>
-              <a href="#" class="btn btn-primary">Learn More</a>
-            </div>
+    <div class="text-center py-5">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6 text-start">
+            <h1 class="fw-bold">
+              Welcome to <span class="">KASETSART UNIVERSITY!</span>
+            </h1>
+            <p class="lead">QUACK on the go, wherever you are!</p>
+            <button type="button" class="btn btn-warning btn-lg fw-bold">
+              GET NOW
+            </button>
+          </div>
+          <div class="col-md-6">
+            <img
+              src="@/assets/KuBanner.jpeg"
+              class="img-fluid hero-img"
+              alt="Duck Toy"
+            />
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <!-- Product Section -->
+  <div class="container my-5">
+    <h2 class="fw-bold text-center my-5">Best Seller</h2>
+    <div class="row g-4">
+      <div
+        v-for="(product, index) in products"
+        :key="index"
+        class="col-lg-3 col-md-4 d-flex justify-content-center"
+      >
+        <ProductCard
+          :name="product.name"
+          :price="product.price"
+          :image="product.image"
+        />
+
+        <!-- <div class="col-lg-4 col-md-6 d-flex justify-content-center">
+        <ProductCard name="P1" price="10" image="@/assets/crytal_g.png" /> -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import ProductCard from "../../components/Product/ProductCard.vue";
+
 export default {
   name: "HomePage",
+  components: {
+    ProductCard,
+  },
+  data() {
+    return {
+      products: [
+        {
+          name: "Emerald",
+          price: 10.0,
+          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+        },
+        {
+          name: "Ruby",
+          price: 20.0,
+          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+        },
+        {
+          name: "Sapphire",
+          price: 30.0,
+          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+        },
+        {
+          name: "Topaz",
+          price: 40.0,
+          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+        },
+        // { name: "Ruby", price: 15.0, image: require("@/assets/crytal_r.png") },
+      ],
+    };
+  },
 };
 </script>
 
 <style scoped>
-.hello {
-  margin-top: 50px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
+/* Add any additional styling here */
 </style>
