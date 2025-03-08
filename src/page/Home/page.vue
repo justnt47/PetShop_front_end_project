@@ -16,7 +16,7 @@
             <img
               src="@/assets/KuBanner.jpeg"
               class="img-fluid hero-img"
-              alt="Duck Toy"
+              alt="KU Banner"
             />
           </div>
         </div>
@@ -37,9 +37,6 @@
           :price="product.price"
           :image="product.image"
         />
-
-        <!-- <div class="col-lg-4 col-md-6 d-flex justify-content-center">
-        <ProductCard name="P1" price="10" image="@/assets/crytal_g.png" /> -->
       </div>
     </div>
   </div>
@@ -76,7 +73,6 @@ export default {
           price: 40.0,
           image: new URL("@/assets/crytal_g.png", import.meta.url).href,
         },
-        // { name: "Ruby", price: 15.0, image: require("@/assets/crytal_r.png") },
       ],
     };
   },
