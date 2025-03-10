@@ -1,8 +1,13 @@
 <template>
-  <div class="background-gradient">
-    <div class="text-center py-5">
+  <div class="container-fluid p-0">
+    <img
+      src="@/assets/KuBanner.jpeg"
+      class="img-fluid"
+      alt="Responsive image"
+    />
+    <!-- <div class="text-center py-5">
       <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center align-middle">
           <div class="col-md-6 text-start">
             <h1 class="fw-bold">
               Welcome to <span class="">KASETSART UNIVERSITY!</span>
@@ -21,16 +26,25 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
+
   <!-- Product Section -->
   <div class="container my-5">
-    <h2 class="fw-bold text-center my-5">Best Seller</h2>
+    <div class="mx-auto text-center my-5">
+      <h2 class="fw-bold my-5">"เนื้อหมาเวร"</h2>
+      <p class="lead my-5">-KU Pet Shop-</p>
+
+      <hr class="my-4 col-6 mx-auto" />
+      <h2 class="fw-bold" style="margin-top: 16vh; margin-bottom: 16vh">
+        สินค้าแนะนำ
+      </h2>
+    </div>
     <div class="row g-4">
       <div
         v-for="(product, index) in products"
         :key="index"
-        class="col-lg-3 col-md-4 d-flex justify-content-center"
+        class="col-lg-3 col-md-4 col-6 d-flex justify-content-center"
       >
         <ProductCard
           :name="product.name"

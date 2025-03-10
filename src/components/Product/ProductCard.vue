@@ -1,29 +1,31 @@
 <template>
-  <div class="card text-center" style="width: 20rem">
+  <router-link
+    :to="{ name: 'ProductDetailPage', params: { id: name } }"
+    class="custom-card text-center"
+    style="width: 20rem"
+  >
     <b-skeleton-wrapper :loading="loading">
       <template #loading>
         <b-skeleton type="image" width="100%" height="180px" />
-        <b-card
-          style="border-top-left-radius: 0px; border-top-right-radius: 0px"
-        >
+        <div class="mt-3">
           <b-skeleton width="80%" />
           <b-skeleton width="60%" />
-          <div class="d-flex justify-content-end mt-3">
-            <b-skeleton width="40%" height="30px" />
-          </div>
-        </b-card>
+        </div>
       </template>
-
       <img :src="image" class="card-img-top" alt="404 Not found" />
       <div class="card-body">
-        <h1 class="card-title text-start fs-6 fw-bold">{{ name }}</h1>
+        <h1 class="card-title text-start fs-6 fw-bold mt-3">{{ name }}</h1>
         <p class="card-text text-start fs-6">{{ price }} ฿ THB</p>
-        <div class="d-flex justify-content-end">
-          <a href="#" class="btn btn-primary">Learn More</a>
-        </div>
+        <!-- <div class="d-flex justify-content-end">
+          <a
+            href="/Products/Detail/{{ name }}"
+            class="stretched-link"
+            @click="handleCardClick"
+          ></a>
+        </div> -->
       </div>
     </b-skeleton-wrapper>
-  </div>
+  </router-link>
 </template>
 
 <script>
@@ -73,8 +75,22 @@ export default {
       this.loading = false;
     }, 1000);
   },
+
+  methods: {
+    handleCardClick() {
+      console.log(`Product Name: ${this.name}`);
+      console.log(`Product Price: ${this.price} ฿ THB`);
+      console.log(`Product Image: ${this.image}`);
+    },
+  },
 };
 </script>
 
 <style scoped>
+.custom-card {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
 </style>

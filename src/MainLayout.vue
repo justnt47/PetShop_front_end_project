@@ -1,7 +1,7 @@
 <template>
-  <div class="main-layout flex">
+  <div class="flex">
     <SideBar />
-    <div class="main-content">
+    <div class="">
       <router-view />
     </div>
   </div>
@@ -14,5 +14,5 @@ import SideBar from "./components/SideBar/SideBar.vue";
 const route = useRoute();
 </script>
   
-  <style scoped>
+<style scoped>
 </style>

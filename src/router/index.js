@@ -1,9 +1,13 @@
 import { onMounted } from "vue";
 import { createRouter, createWebHistory, useRouter } from 'vue-router';
+
 import Login from '../page/Login/page.vue';
 import HomePage from '../page/Home/page.vue';
 import ProductPage from '../page/Product/page.vue';
+import ProductDetailPage from '../page/Product/ProductDetail/page.vue';
+import CartPage from '../page/Cart/page.vue';
 import MainLayout from "../MainLayout.vue";
+import NotFound from "../page/NotFound.vue";
 
 const routes = [
   // {
@@ -35,6 +39,22 @@ const routes = [
         name:'ProductPage',
         component: ProductPage 
       },
+      { 
+        path: '/Products/Detail/:id',
+        name:'ProductDetailPage',
+        component: ProductDetailPage ,
+        props: true
+      },
+      { 
+        path: '/Cart',
+        name:'CartPage',
+        component: CartPage 
+      },
+      { 
+        path: '/:pathMatch(.*)*', 
+        name: 'NotFound', 
+        component: NotFound 
+      },
       
     ]
   },
@@ -43,6 +63,7 @@ const routes = [
     name:'Login',
     component: Login 
   },
+  
 
 
 ];

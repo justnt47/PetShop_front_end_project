@@ -23,7 +23,7 @@
 
       <div class="d-flex align-items-center">
         <router-link
-          :to="{ name: '' }"
+          :to="{ name: 'CartPage' }"
           class="nav-link position-relative d-lg-none"
         >
           <i class="bi bi-cart fs-4"></i>
@@ -75,7 +75,7 @@
           </ul>
           <div class="d-flex align-items-center gap-3">
             <router-link
-              :to="{ name: '' }"
+              :to="{ name: 'CartPage' }"
               class="nav-link position-relative d-lg-block d-none"
             >
               <i class="bi bi-cart fs-4"></i>
@@ -86,7 +86,7 @@
                 <span class="visually-hidden">unread messages</span>
               </span>
             </router-link>
-            <div class="dropdown my-auto d-lg-block d-none">
+            <div class="my-auto d-lg-block d-none">
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
@@ -101,13 +101,13 @@
                 class="dropdown-menu dropdown-menu-end"
                 aria-labelledby="accountDropdown"
               >
-                <li class="dropdown-header">
+                <li class="dropdown-header" @click.stop>
                   <strong>{{ user.name }}</strong> <br />
                   <small class="text-muted">{{ user.email }}</small>
                 </li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
-                  <router-link :to="{ name: '' }" class="dropdown-item">
+                  <router-link to="/A" class="dropdown-item">
                     Profile
                   </router-link>
                 </li>
