@@ -182,6 +182,7 @@ onUnmounted(() => {
 
 .navbar-transparent {
   background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(5px);
   transition: background-color 0.3s;
 }
 
