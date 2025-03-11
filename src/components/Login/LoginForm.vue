@@ -45,7 +45,11 @@
   </form>
 </template>
   
-  <script>
+<script>
+import { Login } from "../../functions/User/User.js";
+import { EventBus } from "../../event-bus.js";
+import { getCookie } from "@/functions/Cookie/Cookie.js";
+
 export default {
   name: "LoginForm",
   data() {
@@ -55,11 +59,39 @@ export default {
       showPassword: false, // Initialize showPassword
     };
   },
+  mounted() {
+    this.checkCookie();
+  },
   methods: {
-    login() {
-      // Handle login logic here
-      console.log("Email:", this.email);
-      console.log("Password:", this.password);
+    async login() {
+      const loginData = {
+        email: this.email,
+        password: this.password,
+      };
+      try {
+        const response = await Login(loginData);
+
+        if (response.login) {
+          EventBus.emit("loginOk", response.user);
+          console.log("Login successful:", response);
+          this.$router.push({ name: "HomePage" });
+        } else {
+          console.error("Login failed:", response);
+        }
+      } catch (error) {
+        console.error("Login failed:", error);
+      }
+    },
+    checkCookie() {
+      try {
+        const user = getCookie();
+        console.log(user);
+        if (user) {
+          this.$router.push({ name: "HomePage" });
+        }
+      } catch (error) {
+        console.error("Check cookie failed:", error);
+      }
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
@@ -68,6 +100,6 @@ export default {
 };
 </script>
   
-  <style scoped>
+<style scoped>
 /* Remove unnecessary scoped styles */
 </style>

@@ -51,6 +51,7 @@
             aria-label="Close"
           ></button>
         </div>
+
         <div class="offcanvas-body">
           <ul class="navbar-nav mx-auto fs-5 fw-bold">
             <li class="nav-item">
@@ -73,6 +74,7 @@
             </li>
             <!-- Add more nav items here -->
           </ul>
+
           <div class="d-flex align-items-center gap-3">
             <router-link
               :to="{ name: 'CartPage' }"
@@ -86,37 +88,47 @@
                 <span class="visually-hidden">unread messages</span>
               </span>
             </router-link>
+
             <div class="my-auto d-lg-block d-none">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="accountDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="bi bi-person-circle fs-4"></i> TEST {{ user.name }}
-              </a>
-              <ul
-                class="dropdown-menu dropdown-menu-end"
-                aria-labelledby="accountDropdown"
-              >
-                <li class="dropdown-header" @click.stop>
-                  <strong>{{ user.name }}</strong> <br />
-                  <small class="text-muted">{{ user.email }}</small>
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <router-link to="/A" class="dropdown-item">
-                    Profile
-                  </router-link>
-                </li>
-                <li>
-                  <router-link :to="{ name: 'Login' }" class="dropdown-item">
-                    Login
-                  </router-link>
-                </li>
-              </ul>
+              <template v-if="decodedToken">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="accountDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="bi bi-person-circle fs-4"></i>
+                  {{ user.fname }}
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="accountDropdown"
+                >
+                  <li class="dropdown-header" @click.stop>
+                    <strong>{{ user.fname }} {{ user.lname }}</strong> <br />
+                    <small class="text-muted">{{ user.email }}</small>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <router-link to="/A" class="dropdown-item">
+                      Profile
+                    </router-link>
+                  </li>
+                  <li>
+                    <router-link :to="{ name: 'Login' }" class="dropdown-item">
+                      Logout
+                    </router-link>
+                  </li>
+                </ul>
+              </template>
+
+              <template v-else>
+                <router-link :to="{ name: 'Login' }" class="nav-link">
+                  Login
+                </router-link>
+              </template>
             </div>
           </div>
         </div>
@@ -125,36 +137,69 @@
   </nav>
 </template>
 
-<script setup>
+
+<script >
 import { ref, onMounted, onUnmounted } from "vue";
 import { Dropdown } from "bootstrap";
+import { getCookie } from "@/functions/Cookie/Cookie";
 
-const user = ref({ name: "John Doe", email: "john.doe@example.com" });
+export default {
+  name: "Navbar",
+  data() {
+    return {
+      user: ref({
+        fname: "",
+        lname: "",
+        email: "",
+        role: "",
+      }),
+      isSticky: ref(false),
+      isTransparent: ref(false),
+      decodedToken: null,
+    };
+  },
+  methods: {
+    handleScroll() {
+      if (window.scrollY > 2) {
+        this.isSticky = true;
+        this.isTransparent = true;
+      } else {
+        this.isSticky = false;
+        this.isTransparent = false;
+      }
+    },
+  },
+  mounted() {
+    this.decodedToken = getCookie();
+    if (this.decodedToken) {
+      this.user.fname = this.decodedToken.fName;
+      this.user.lname = this.decodedToken.lName;
+      this.user.email = this.decodedToken.Email;
+      this.user.role = this.decodedToken.roleEN;
+    }
+    window.addEventListener("scroll", this.handleScroll);
+    const dropdownElement = document.getElementById("accountDropdown");
+    if (dropdownElement) {
+      new Dropdown(dropdownElement); // Enable Bootstrap dropdown functionality
+    }
+  },
+  unmounted() {
+    window.removeEventListener("scroll", this.handleScroll);
+  },
+  onUnmounted() {
+    window.removeEventListener("scroll", handleScroll);
+  },
 
-const isSticky = ref(false);
-const isTransparent = ref(false);
-
-const handleScroll = () => {
-  if (window.scrollY > 2) {
-    isSticky.value = true;
-    isTransparent.value = true;
-  } else {
-    isSticky.value = false;
-    isTransparent.value = false;
-  }
+  handleScroll() {
+    if (window.scrollY > 2) {
+      this.isSticky = true;
+      this.isTransparent = true;
+    } else {
+      this.isSticky = false;
+      this.isTransparent = false;
+    }
+  },
 };
-
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-  const dropdownElement = document.getElementById("accountDropdown");
-  if (dropdownElement) {
-    new Dropdown(dropdownElement); // Enable Bootstrap dropdown functionality
-  }
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
 </script>
 
 <style scoped>
