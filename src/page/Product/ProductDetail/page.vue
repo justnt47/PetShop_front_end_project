@@ -20,7 +20,7 @@
 
       <div class="row my-auto g-4 py-5 d-flex justify-content-center">
         <div class="col-6 text-center">
-          <img :src="productImage" alt="Product Image" class="img-fluid" />
+          <img src="" alt="Product Image" class="img-fluid" />
         </div>
         <div class="col-4">
           <h1>{{ id }}</h1>
@@ -61,14 +61,12 @@ export default {
   data() {
     return {
       loading: true, // Set this to false when data is loaded
-      productImage: "", // Placeholder for product image
     };
   },
   mounted() {
     // Simulate data loading
     setTimeout(() => {
       this.loading = false;
-      this.productImage = "path/to/your/product/image.jpg"; // Set the actual product image path
     }, 1000);
   },
 };

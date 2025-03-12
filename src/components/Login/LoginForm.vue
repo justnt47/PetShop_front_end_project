@@ -49,6 +49,7 @@
 import { Login } from "../../functions/User/User.js";
 import { EventBus } from "../../event-bus.js";
 import { getCookie } from "@/functions/Cookie/Cookie.js";
+import Swal from "sweetalert2";
 
 export default {
   name: "LoginForm",
@@ -76,9 +77,19 @@ export default {
           console.log("Login successful:", response);
           this.$router.push({ name: "HomePage" });
         } else {
+          Swal.fire({
+            icon: "error",
+            title: "Login failed",
+            text: response.message,
+          });
           console.error("Login failed:", response);
         }
       } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Login failed",
+          text: error.message,
+        });
         console.error("Login failed:", error);
       }
     },

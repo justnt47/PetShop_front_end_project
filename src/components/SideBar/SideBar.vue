@@ -117,9 +117,9 @@
                     </router-link>
                   </li>
                   <li>
-                    <router-link :to="{ name: 'Login' }" class="dropdown-item">
+                    <button class="dropdown-item" @click="handleLogout">
                       Logout
-                    </router-link>
+                    </button>
                   </li>
                 </ul>
               </template>
@@ -139,9 +139,11 @@
 
 
 <script >
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watchEffect, watch } from "vue"; // Add 'watch'
 import { Dropdown } from "bootstrap";
 import { getCookie } from "@/functions/Cookie/Cookie";
+import { EventBus } from "@/event-bus";
+import { Logout } from "@/functions/User/User";
 
 export default {
   name: "Navbar",
@@ -155,7 +157,7 @@ export default {
       }),
       isSticky: ref(false),
       isTransparent: ref(false),
-      decodedToken: null,
+      decodedToken: ref(getCookie()),
     };
   },
   methods: {
@@ -168,36 +170,53 @@ export default {
         this.isTransparent = false;
       }
     },
+    handleLogout() {
+      console.log(`call logout`);
+      Logout();
+      EventBus.emit("logout"); // Notify other components
+    },
+    updateUserData() {
+      this.decodedToken = getCookie(); // Get the latest token
+      if (this.decodedToken) {
+        this.user.fname = this.decodedToken.fName;
+        this.user.lname = this.decodedToken.lName;
+        this.user.email = this.decodedToken.Email;
+        this.user.role = this.decodedToken.roleEN;
+      } else {
+        this.user = { fname: "", lname: "", email: "", role: "" }; // Clear data on logout
+      }
+    },
   },
   mounted() {
-    this.decodedToken = getCookie();
-    if (this.decodedToken) {
-      this.user.fname = this.decodedToken.fName;
-      this.user.lname = this.decodedToken.lName;
-      this.user.email = this.decodedToken.Email;
-      this.user.role = this.decodedToken.roleEN;
-    }
+    this.updateUserData(); // Fetch user info on mount
+
     window.addEventListener("scroll", this.handleScroll);
     const dropdownElement = document.getElementById("accountDropdown");
     if (dropdownElement) {
       new Dropdown(dropdownElement); // Enable Bootstrap dropdown functionality
     }
+
+    // Watch for logout event
+    EventBus.on("logout", () => {
+      this.updateUserData(); // Update component when logout event occurs
+    });
+
+    // Auto-update token when it changes
+    watchEffect(() => {
+      this.updateUserData();
+    });
+
+    // Watch for changes in decodedToken
+    watch(
+      () => this.decodedToken,
+      () => {
+        this.updateUserData();
+      }
+    );
   },
   unmounted() {
     window.removeEventListener("scroll", this.handleScroll);
-  },
-  onUnmounted() {
-    window.removeEventListener("scroll", handleScroll);
-  },
-
-  handleScroll() {
-    if (window.scrollY > 2) {
-      this.isSticky = true;
-      this.isTransparent = true;
-    } else {
-      this.isSticky = false;
-      this.isTransparent = false;
-    }
+    EventBus.off("logout"); // Cleanup event listener
   },
 };
 </script>

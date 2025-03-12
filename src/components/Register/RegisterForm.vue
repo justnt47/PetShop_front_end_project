@@ -107,6 +107,9 @@
 </template>
 
 <script>
+import Swal from "sweetalert2";
+import { Register } from "../../functions/User/User.js";
+import { EventBus } from "../../event-bus.js";
 export default {
   name: "RegisterForm",
   data() {
@@ -126,7 +129,7 @@ export default {
     };
   },
   methods: {
-    signup() {
+    async signup() {
       this.validateForm();
       if (
         !this.fNameError &&
@@ -135,9 +138,39 @@ export default {
         !this.passwordError &&
         !this.confPasswordError
       ) {
-        // Handle signup logic here
-        console.log("Email:", this.email);
-        console.log("Password:", this.password);
+        const formData = {
+          Email: this.email,
+          fName: this.fName,
+          lName: this.lName,
+          password: this.password,
+        };
+        try {
+          // const response = await Register(formData);
+          if (response.success) {
+            Swal.fire({
+              title: "Success!",
+              text: "You have successfully registered.",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then(() => {
+              this.$router.push({ name: "HomePage" });
+            });
+          } else {
+            Swal.fire({
+              title: "Error!",
+              text: response.message,
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "Error!",
+            text: "An error occurred during registration.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
       }
     },
     validateForm() {

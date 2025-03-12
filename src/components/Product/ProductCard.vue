@@ -1,13 +1,13 @@
 <template>
   <router-link
     :to="{ name: 'ProductDetailPage', params: { id: name } }"
-    class="custom-card text-center"
+    class="card text-center"
     style="width: 20rem"
   >
     <b-skeleton-wrapper :loading="loading">
       <template #loading>
         <b-skeleton type="image" width="100%" height="180px" />
-        <div class="mt-3">
+        <div class="container mt-3">
           <b-skeleton width="80%" />
           <b-skeleton width="60%" />
         </div>
@@ -87,6 +87,18 @@ export default {
 </script>
 
 <style scoped>
+.card {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: 0.4s;
+}
+.card:hover {
+  transform: translateY(-5px);
+  /* top: -5px; */
+}
+
 .custom-card {
   position: relative;
   cursor: pointer;

@@ -16,3 +16,30 @@ export const Login = async (data) => {
         throw error; // Re-throw the error to handle it in the calling function
     }
 };
+
+export const Register = async (data) => {
+    const url = `${apiUrl}/members`;
+    
+    try {
+        console.log(data);
+        const response = await axios.post(url, data);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+        throw error; // Re-throw the error to handle it in the calling function
+    }
+};
+
+export const Logout = async () => {
+    const url = `${apiUrl}/members/logout`;
+    
+    try {
+        const response = await axios.get(url);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+        throw error; // Re-throw the error to handle it in the calling function
+    }
+};
