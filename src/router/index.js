@@ -6,27 +6,18 @@ import HomePage from '../page/Home/page.vue';
 import ProductPage from '../page/Product/page.vue';
 import ProductDetailPage from '../page/Product/ProductDetail/page.vue';
 import CartPage from '../page/Cart/page.vue';
+import ProfilePage from '../components/Settings/ProfilePage.vue';
+import ChangePwdPage from '../components/Settings/FormChangePwd.vue';
+import MangeProductPage from '../components/Settings/MangeProductPage.vue';
+import SettingsPage from '../page/Settings/page.vue';
 import MainLayout from "../MainLayout.vue";
 import NotFound from "../page/NotFound.vue";
 
 const routes = [
-  // {
-  //   path: '/',
-  //   redirect: { name: 'HelloWorld' } // Redirect to the "Home" page by default
-  // },
-  // { 
-  //   path: '/login',
-  //   name:'Login',
-  //   component: Login 
-  // },
-  // { 
-  //   path: '/',
-  //   name:'HelloWorld',
-  //   component: HelloWorld 
-  // },
+
   {
     path: "/",
-    component: MainLayout, // Main layout for all routes except login
+    component: MainLayout, 
     redirect: "/",
     children: [
       { 
@@ -49,6 +40,28 @@ const routes = [
         path: '/Cart',
         name:'CartPage',
         component: CartPage 
+      },
+      { 
+        path: '/Settings',
+        name:'SettingsPage',
+        component: SettingsPage,
+        children: [
+          { 
+            path: '/Settings/Profile',
+            name:'ProfilePage',
+            component: ProfilePage 
+          },
+          { 
+            path: '/Settings/Change-Password',
+            name:'ChangePwdPage',
+            component: ChangePwdPage 
+          },
+          { 
+            path: '/Settings/Mange-Product',
+            name:'MangeProductPage',
+            component: MangeProductPage 
+          },
+        ]
       },
       { 
         path: '/:pathMatch(.*)*', 

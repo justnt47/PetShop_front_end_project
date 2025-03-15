@@ -112,13 +112,16 @@
                   </li>
                   <li><hr class="dropdown-divider" /></li>
                   <li>
-                    <router-link to="/A" class="dropdown-item">
-                      Profile
+                    <router-link
+                      :to="{ name: 'ProfilePage' }"
+                      class="dropdown-item"
+                    >
+                      <i class="bi bi-gear"></i> Settings
                     </router-link>
                   </li>
                   <li>
                     <button class="dropdown-item" @click="handleLogout">
-                      Logout
+                      <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                   </li>
                 </ul>
@@ -201,11 +204,6 @@ export default {
       this.updateUserData(); // Update component when logout event occurs
     });
 
-    // Auto-update token when it changes
-    watchEffect(() => {
-      this.updateUserData();
-    });
-
     // Watch for changes in decodedToken
     watch(
       () => this.decodedToken,
@@ -245,9 +243,9 @@ export default {
 }
 
 .navbar-transparent {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(5px);
-  transition: background-color 0.3s;
+  /* background-color: rgba(255, 255, 255, 0.8) !important; */
+  /* backdrop-filter: blur(5px); */
+  /* transition: background-color 0.3s; */
 }
 
 .nav-logo {
