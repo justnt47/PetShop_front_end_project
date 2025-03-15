@@ -113,7 +113,7 @@
                 ></i>
               </span>
             </div>
-            <div v-if="errConfirmPassword" class="invalid-feedback">
+            <div v-if="this.errConfirmPassword" class="invalid-feedback">
               รหัสผ่านไม่ตรงกัน กรุณากรอกใหม่อีกครั้ง
             </div>
             <div v-else class="valid-feedback"></div>
@@ -213,8 +213,9 @@
 
 <script>
 import Swal from "sweetalert2";
-import { getCookie } from "@/functions/Cookie/Cookie";
 import bcrypt from "bcryptjs";
+import { getCookie } from "@/functions/Cookie/Cookie";
+import { UpdatePassword } from "@/functions/User/User";
 
 export default {
   name: "ChangePasswordPage",
@@ -275,8 +276,10 @@ export default {
         this.confirmPassword.length !== 0 &&
         this.newPassword !== this.confirmPassword
       ) {
+        console.log(this.errConfirmPassword);
         this.errConfirmPassword = true;
       } else {
+        console.log(this.errConfirmPassword);
         this.errConfirmPassword = false;
       }
     },
@@ -315,10 +318,10 @@ export default {
           return false;
         }
       }
-
+      // await this.compareConfPwd();
       this.errOldPassword = false;
       this.errNewPassword = false;
-      this.errConfirmPassword = false;
+      // this.errConfirmPassword = false;
       this.msg = "";
       return true;
     },
@@ -334,10 +337,29 @@ export default {
         showCancelButton: true,
         confirmButtonText: "Yes, save it!",
         cancelButtonText: "No, cancel!",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          // Add your save logic here
-          Swal.fire("Saved!", "Your password has been changed.", "success");
+          const response = await UpdatePassword({
+            email: this.deCoded.Email,
+            password: this.newPassword,
+          });
+          console.log(response);
+          if (response.status === 200) {
+            this.oldPassword = "";
+            this.newPassword = "";
+            this.confirmPassword = "";
+            this.errOldPassword = false;
+            this.errNewPassword = false;
+            this.errConfirmPassword = false;
+            this.msg = "";
+            Swal.fire("Saved!", "Your password has been changed.", "success");
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Failed to change password",
+              text: response.message,
+            });
+          }
         }
       });
     },

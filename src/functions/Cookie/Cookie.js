@@ -3,7 +3,7 @@ import {jwtDecode} from "jwt-decode"; // Correct the import statement
 
 export const getCookie = () => {
     const token = Cookies.get('token');
-    console.log(`token: ${token}`);
+    // console.log(`token: ${token}`);
     if (token) {
         try {
             const decoded = jwtDecode(token); // Use the default export
