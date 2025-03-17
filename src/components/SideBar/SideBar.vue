@@ -18,7 +18,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <router-link :to="{ name: 'HomePage' }" class="navbar-brand">
-        <img src="@/assets/KuLogo.png" alt="Logo" class="nav-logo" />
+        <img src="@/assets/logoPetShop.png" alt="Logo" class="nav-logo" />
       </router-link>
 
       <div class="d-flex align-items-center">

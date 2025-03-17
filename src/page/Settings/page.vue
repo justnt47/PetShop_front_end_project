@@ -21,6 +21,11 @@
                   class="list-group-item list-group-item-action"
                   >Change Password</router-link
                 >
+                <router-link
+                  to="Cart-History"
+                  class="list-group-item list-group-item-action"
+                  >Cart history</router-link
+                >
               </div>
             </div>
             <div class="col-md-9 my-2">

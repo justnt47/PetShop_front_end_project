@@ -12,6 +12,7 @@ import MangeProductPage from '../components/Settings/MangeProductPage.vue';
 import SettingsPage from '../page/Settings/page.vue';
 import MainLayout from "../MainLayout.vue";
 import NotFound from "../page/NotFound.vue";
+import CartHistory from "@/components/Settings/CartHistory.vue";
 
 const routes = [
 
@@ -60,6 +61,11 @@ const routes = [
             path: '/Settings/Mange-Product',
             name:'MangeProductPage',
             component: MangeProductPage 
+          },
+          {
+            path: '/Settings/Cart-History',
+            name:'CartHistory',
+            component: CartHistory
           },
         ]
       },

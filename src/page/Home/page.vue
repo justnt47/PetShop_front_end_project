@@ -1,39 +1,17 @@
 <template>
-  <div class="container-fluid p-0">
+  <div class="banner-container">
     <img
-      src="@/assets/KuBanner.jpeg"
-      class="img-fluid"
+      src="@/assets/bannerPetShop1.jpg"
+      class="banner-img"
       alt="Responsive image"
     />
-    <!-- <div class="text-center py-5">
-      <div class="container">
-        <div class="row align-items-center align-middle">
-          <div class="col-md-6 text-start">
-            <h1 class="fw-bold">
-              Welcome to <span class="">KASETSART UNIVERSITY!</span>
-            </h1>
-            <p class="lead">QUACK on the go, wherever you are!</p>
-            <button type="button" class="btn btn-warning btn-lg fw-bold">
-              GET NOW
-            </button>
-          </div>
-          <div class="col-md-6">
-            <img
-              src="@/assets/KuBanner.jpeg"
-              class="img-fluid hero-img"
-              alt="KU Banner"
-            />
-          </div>
-        </div>
-      </div>
-    </div> -->
   </div>
 
   <!-- Product Section -->
   <div class="container my-5">
     <div class="mx-auto text-center my-5">
-      <h2 class="fw-bold my-5">"เนื้อหมาเวร"</h2>
-      <p class="lead my-5">-KU Pet Shop-</p>
+      <h2 class="fw-bold my-5">"เพราะสุนัขคือครอบครัว เราจึงเลือกสิ่งที่ดีที่สุดให้เขา"</h2>
+      <p class="lead my-5">-Pet Shop-</p>
 
       <hr class="my-4 col-6 mx-auto" />
       <h2 class="fw-bold" style="margin-top: 16vh; margin-bottom: 16vh">
@@ -68,24 +46,24 @@ export default {
     return {
       products: [
         {
-          name: "Emerald",
-          price: 10.0,
-          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+          name: "สมาร์ทฮาร์ท Power Pack อาหารสุนัข เน้นโปรตีน ไขมันสูง สร้างกล้ามเนื้อ (10kg)",
+          price: 800.0,
+          image: new URL("@/assets/food1.jpg", import.meta.url).href,
         },
         {
           name: "Ruby",
           price: 20.0,
-          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+          image: new URL("@/assets/food1.jpg", import.meta.url).href,
         },
         {
           name: "Sapphire",
           price: 30.0,
-          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+          image: new URL("@/assets/food1.jpg", import.meta.url).href,
         },
         {
           name: "Topaz",
           price: 40.0,
-          image: new URL("@/assets/crytal_g.png", import.meta.url).href,
+          image: new URL("@/assets/food1.jpg", import.meta.url).href,
         },
       ],
     };
@@ -94,5 +72,15 @@ export default {
 </script>
 
 <style scoped>
-/* Add any additional styling here */
+.banner-container {
+  width: 100vw;
+  overflow: hidden;
+}
+
+.banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
 </style>

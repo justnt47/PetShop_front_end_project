@@ -21,26 +21,17 @@
             v-model="productType"
             aria-label="Small select example"
           >
-            <option value="" selected>กรุณาเลือก</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+          <option value="" selected>กรุณาเลือก</option>
+            <option value="1">อาหารสุนัข</option>
+            <option value="2">ขนม</option>
+            <option value="3">อุปกรณ์</option>
+            <option value="4">ของเล่น</option>
+            <option value="5">กรง ที่นอน</option>
+            <option value="6">ผลิตภัณฑ์ทำความสะอาด</option>
+            <option value="7">ปลอกคอ สายจูง</option>
           </select>
         </div>
-        <div class="col-md-2">
-          <label for="productBrand" class="form-label">แบรนด์</label>
-          <select
-            id="productBrand"
-            class="form-select"
-            v-model="productBrand"
-            aria-label="Small select example"
-          >
-            <option value="" selected>กรุณาเลือก</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-          </select>
-        </div>
+
         <div class="col-md-1 d-flex align-items-end">
           <button
             type="button"
