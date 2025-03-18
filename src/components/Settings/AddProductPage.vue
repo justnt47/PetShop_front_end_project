@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h2 class="pb-3">Add Product</h2>
+
     <div class="card p-4">
       <div class="row">
         <!-- Left Section: Drag & Drop & Click Upload Box -->
@@ -49,23 +50,33 @@
               <i class="bi bi-trash"></i> Remove
             </button>
           </div>
+
+          <div v-if="fileInputError" class="text-danger mt-2">
+            กรุณาอัปโหลดรูปภาพ
+          </div>
         </div>
 
         <!-- Right Section: Product Details -->
         <div class="col-md-6">
           <div class="row mb-3">
-            <label class="col-sm-4 col-form-label">ชื่อสินค้า</label>
+            <label class="col-sm-4 col-form-label"
+              >ชื่อสินค้า
+              <span class="text-danger">*</span>
+            </label>
             <div class="col-sm-8">
               <input
                 v-model="productName"
                 class="form-control"
                 placeholder="Name"
+                :class="{ 'is-invalid': productNameError }"
+                required
               />
+              <div class="invalid-feedback">กรุณากรอกชื่อสินค้า</div>
             </div>
           </div>
           <div class="row mb-3">
             <label for="productType" class="col-sm-4 form-label"
-              >ประเภทสินค้า</label
+              >ประเภทสินค้า <span class="text-danger">*</span></label
             >
             <div class="col-sm-8">
               <select
@@ -73,20 +84,41 @@
                 class="form-select"
                 v-model="productType"
                 aria-label="Small select example"
+                :class="{ 'is-invalid': productTypeError }"
+                required
               >
                 <option value="" selected>กรุณาเลือก</option>
-                <option value="1">อาหารสุนัข</option>
-                <option value="2">ขนม</option>
-                <option value="3">อุปกรณ์</option>
-                <option value="4">ของเล่น</option>
-                <option value="5">กรง ที่นอน</option>
-                <option value="6">ผลิตภัณฑ์ทำความสะอาด</option>
-                <option value="7">ปลอกคอ สายจูง</option>
+                <option
+                  v-for="type in productTypesData"
+                  :key="type.id"
+                  :value="type.product_type_id"
+                >
+                  {{ type.product_type_name }}
+                </option>
               </select>
+              <div class="invalid-feedback">กรุณาเลือกประเภทสินค้า</div>
             </div>
           </div>
           <div class="row mb-3">
-            <label class="col-sm-4 col-form-label">ราคา</label>
+            <label class="col-sm-4 col-form-label"
+              >รายละเอียดสินค้า<span class="text-danger">*</span></label
+            >
+            <div class="col-sm-8">
+              <textarea
+                class="form-control"
+                id="floatingTextarea"
+                rows="5"
+                v-model="productDtl"
+                :class="{ 'is-invalid': productDtlError }"
+                required
+              ></textarea>
+              <div class="invalid-feedback">กรุณากรอกรายละเอียดสินค้า</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-4 col-form-label"
+              >ราคา<span class="text-danger">*</span></label
+            >
             <div class="col-sm-8">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -103,7 +135,10 @@
                   v-model="productPrice"
                   class="form-control"
                   placeholder="Price"
+                  :class="{ 'is-invalid': productPriceError }"
+                  required
                 />
+                <div class="invalid-feedback">กรุณากรอกราคา</div>
               </div>
             </div>
           </div>
@@ -117,30 +152,63 @@
             >
               <i class="bi bi-x-circle"></i> Cancel
             </button>
-            <button type="button" class="btn btn-success" @click="saveProduct">
+            <button type="button" class="btn btn-success" @click="validateForm">
               <i class="bi bi-check-circle"></i> Save
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- Section to Display Converted Image -->
+      <div v-if="convertedImageUrl" class="mt-4">
+        <h3>Converted Image</h3>
+        <img
+          :src="convertedImageUrl"
+          alt="Converted Image"
+          class="img-thumbnail"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
-import axios from "axios";
+import { onMounted, ref } from "vue";
+import Swal from "sweetalert2";
+import { AddProduct } from "@/functions/Product/Product";
+import { GetProductTypes } from "@/functions/MastereData/MasterData";
 
 export default {
   name: "AddProductPage",
   setup() {
+    const productTypesData = ref([]);
+
     const imageUrl = ref(null);
     const selectedFile = ref(null);
     const productName = ref("");
-    const productPrice = ref("");
+    const productPrice = ref(null);
+    const productDtl = ref("");
     const productType = ref("");
     const isDragging = ref(false);
     const fileInput = ref(null);
+    const convertedImageUrl = ref(null);
+
+    const productNameError = ref(false);
+    const productTypeError = ref(false);
+    const productDtlError = ref(false);
+    const productPriceError = ref(false);
+    const fileInputError = ref(false);
+
+    onMounted(async () => {
+      try {
+        const response = await GetProductTypes();
+        console.log("Product Types Data:", response);
+        // console.log(response.data);
+        productTypesData.value = response;
+      } catch (error) {
+        console.error("Error fetching product types:", error);
+      }
+    });
 
     // Handle file preview when uploaded via click or drag & drop
     const previewImage = (event) => {
@@ -148,6 +216,7 @@ export default {
       if (file) {
         selectedFile.value = file;
         imageUrl.value = URL.createObjectURL(file);
+        fileInputError.value = false;
       }
     };
 
@@ -158,6 +227,7 @@ export default {
       if (file) {
         selectedFile.value = file;
         imageUrl.value = URL.createObjectURL(file);
+        fileInputError.value = false;
       }
     };
 
@@ -186,8 +256,11 @@ export default {
       imageUrl.value = null;
       selectedFile.value = null;
       productName.value = "";
-      productPrice.value = "";
+      productPrice.value = null;
+      productDtl.value = "";
       productType.value = "";
+      convertedImageUrl.value = null;
+      fileInputError.value = false;
     };
 
     const convertToBlob = (file) => {
@@ -202,11 +275,26 @@ export default {
       });
     };
 
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => resolve(reader.result.split(",")[1]); // ตัด `data:image/png;base64,` ออก
+        reader.onerror = reject;
+      });
+    }
+
+    const base64ToImage = (base64) => {
+      return `data:image/png;base64,${base64}`;
+    };
+
     const uploadImage = async (file) => {
       const blob = await convertToBlob(file);
+      const base64 = await blobToBase64(blob);
+      console.log(`base64`, base64);
       console.log(`blob`, blob);
 
-      return blob;
+      return { base64: base64, blob: blob };
     };
 
     const saveProduct = async () => {
@@ -218,29 +306,58 @@ export default {
       }
 
       const productData = {
-        imageUrl: uploadedImageUrl,
-        productName: productName.value,
-        productPrice: productPrice.value,
-        productType: productType.value,
+        product_name: productName.value,
+        product_detail: productDtl.value,
+        product_image: uploadedImageUrl.base64,
+        product_type_id: productType.value,
+        product_price: productPrice.value,
       };
       console.log(`productData`, productData);
 
+      // Convert base64 back to image URL for testing
+      // convertedImageUrl.value = base64ToImage(uploadedImageUrl.base64);
+      // console.log(`convertedImageUrl`, convertedImageUrl.value);
+
       try {
-        // const response = await axios.post(
-        //   "http://localhost:3000/products",
-        //   productData
-        // );
-        // console.log("Product saved:", response.data);
-        resetForm();
+        const response = await AddProduct(productData);
+        if (response.status === 200) {
+          Swal.fire("Saved!", "Your product has been added.", "success");
+          resetForm();
+        } else {
+          Swal.fire("Error!", response.data.error, "error");
+        }
       } catch (error) {
+        Swal.fire("Error!", error.response.data.error, "error");
         console.error("Error saving product:", error);
       }
     };
 
+    const validateForm = () => {
+      productNameError.value = !productName.value;
+      productTypeError.value = !productType.value;
+      productDtlError.value = !productDtl.value;
+      productPriceError.value = !productPrice.value;
+      fileInputError.value = !selectedFile.value;
+
+      if (
+        productNameError.value ||
+        productTypeError.value ||
+        productDtlError.value ||
+        productPriceError.value ||
+        fileInputError.value
+      ) {
+        return false;
+      } else {
+        saveProduct();
+      }
+    };
+
     return {
+      productTypesData,
       imageUrl,
       productName,
       productPrice,
+      productDtl,
       productType,
       saveProduct,
       resetForm,
@@ -252,6 +369,13 @@ export default {
       openFilePicker,
       isDragging,
       fileInput,
+      convertedImageUrl,
+      productNameError,
+      productTypeError,
+      productDtlError,
+      productPriceError,
+      fileInputError,
+      validateForm,
     };
   },
 };
