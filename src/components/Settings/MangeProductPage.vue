@@ -42,10 +42,12 @@
           </button>
         </div>
         <div class="col d-flex align-items-end justify-content-end">
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i>
-            Add Product
-          </button>
+          <router-link :to="{ name: 'AddProductPage' }">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-plus-circle"></i>
+              Add Product
+            </button>
+          </router-link>
         </div>
       </div>
     </form>

@@ -9,6 +9,7 @@ import CartPage from '../page/Cart/page.vue';
 import ProfilePage from '../components/Settings/ProfilePage.vue';
 import ChangePwdPage from '../components/Settings/FormChangePwd.vue';
 import MangeProductPage from '../components/Settings/MangeProductPage.vue';
+import AddProductPage from '../components/Settings/AddProductPage.vue';
 import SettingsPage from '../page/Settings/page.vue';
 import MainLayout from "../MainLayout.vue";
 import NotFound from "../page/NotFound.vue";
@@ -65,7 +66,11 @@ const routes = [
           {
             path: '/Settings/Cart-History',
             name:'CartHistory',
-            component: CartHistory
+            component: CartHistory},
+          { 
+            path: '/Settings/Add-Product',
+            name:'AddProductPage',
+            component: AddProductPage 
           },
         ]
       },
