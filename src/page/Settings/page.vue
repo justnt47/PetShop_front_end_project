@@ -7,22 +7,22 @@
             <div class="col-md-3 my-4" style="padding-top: 0vh">
               <div class="mt-5 list-group list-group-flush">
                 <router-link
-                  to="Mange-Product"
+                  to="/Settings/Mange-Product"
                   class="list-group-item list-group-item-action"
                   >Manage Product</router-link
                 >
                 <router-link
-                  to="Profile"
+                  to="/Settings/Profile"
                   class="list-group-item list-group-item-action"
                   >Profile</router-link
                 >
                 <router-link
-                  to="change-password"
+                  to="/Settings/change-password"
                   class="list-group-item list-group-item-action"
                   >Change Password</router-link
                 >
                 <router-link
-                  to="Cart-History"
+                  to="/Settings/Cart-History"
                   class="list-group-item list-group-item-action"
                   >Cart history</router-link
                 >

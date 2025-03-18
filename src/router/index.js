@@ -14,6 +14,7 @@ import SettingsPage from '../page/Settings/page.vue';
 import MainLayout from "../MainLayout.vue";
 import NotFound from "../page/NotFound.vue";
 import CartHistory from "@/components/Settings/CartHistory.vue";
+import CartHistoryDetail from '../page/Cart/CartHistoryDetail/page.vue';
 
 const routes = [
 
@@ -66,11 +67,18 @@ const routes = [
           {
             path: '/Settings/Cart-History',
             name:'CartHistory',
-            component: CartHistory},
+            component: CartHistory,
+            children:[]
+          },
           { 
             path: '/Settings/Add-Product',
             name:'AddProductPage',
             component: AddProductPage 
+          },
+          { 
+            path: '/Settings/Cart-History/Detail',
+            name:'CartHistoryDetail',
+            component: CartHistoryDetail ,
           },
         ]
       },

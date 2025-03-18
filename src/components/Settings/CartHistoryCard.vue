@@ -1,5 +1,10 @@
 <template>
-    <div class="card p-3 mb-3">
+  <router-link
+    :to="{ name: 'CartHistoryDetail'}"
+    class="card text-center"
+    
+    >
+    <div class=" p-3 mb-3">
       <div class="row">
         
         <div class="col-md-9 text-start">
@@ -9,6 +14,7 @@
         
       </div>
     </div>
+  </router-link>
   </template>
 
 <script>
@@ -19,5 +25,11 @@ name: "CartHistoryCard"
 </script>
 
 <style>
+.card {
+  position: relative;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
 
 </style>
