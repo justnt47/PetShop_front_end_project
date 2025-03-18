@@ -5,12 +5,12 @@
   <form @submit.prevent="submitForm">
       <div class="row py-3">
         <div class="col-md-3">
-          <label class="form-label invisible">Hidden Label</label>
+          <label for="productType" class="form-label">ชื่อสินค้า</label>
           <input
             class="form-control"
             type="text"
             v-model="productName"
-            placeholder="ชื่อสินค้า"
+            placeholder="กรุณาใส่ชื่อสินค้า"
             aria-label="default input example"
           />
         </div>
