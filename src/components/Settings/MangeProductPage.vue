@@ -4,31 +4,25 @@
     <form @submit.prevent="submitForm">
       <div class="row py-3">
         <div class="col-md-3">
-          <label class="form-label invisible">Hidden Label</label>
+          <label class="form-label">ชื่อสินค้า</label>
           <input
             class="form-control"
             type="text"
             v-model="productName"
-            placeholder="ชื่อสินค้า/รหัสสินค้า"
-            aria-label="default input example"
+            placeholder="ชื่อสินค้า"
           />
         </div>
         <div class="col-md-2">
           <label for="productType" class="form-label">ประเภทสินค้า</label>
-          <select
-            id="productType"
-            class="form-select"
-            v-model="productType"
-            aria-label="Small select example"
-          >
-          <option value="" selected>กรุณาเลือก</option>
-            <option value="1">อาหารสุนัข</option>
-            <option value="2">ขนม</option>
-            <option value="3">อุปกรณ์</option>
-            <option value="4">ของเล่น</option>
-            <option value="5">กรง ที่นอน</option>
-            <option value="6">ผลิตภัณฑ์ทำความสะอาด</option>
-            <option value="7">ปลอกคอ สายจูง</option>
+          <select id="productType" class="form-select" v-model="productType">
+            <option value="" selected>กรุณาเลือก</option>
+            <option
+              v-for="type in productTypesData"
+              :key="type.id"
+              :value="type.product_type_id"
+            >
+              {{ type.product_type_name }}
+            </option>
           </select>
         </div>
 
@@ -51,11 +45,12 @@
         </div>
       </div>
     </form>
+
     <div
       class="card-body overflow-auto"
       style="max-height: 100vh; padding-left: 0px"
     >
-      <div v-for="product in products" :key="product.id">
+      <div v-for="product in filteredProducts" :key="product.product_id">
         <ManageProductCard :product="product" />
       </div>
     </div>
@@ -63,79 +58,84 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import ManageProductCard from "../../components/Settings/ManageProductCard.vue";
+import { GetProducts } from "@/functions/Product/Product";
+import { GetProductTypes } from "@/functions/MasterData/MasterData";
 
 export default {
-  name: "MangeProductPage",
+  name: "ManageProductPage",
   components: { ManageProductCard },
   data() {
     return {
-      products: ref([
-        {
-          id: 1,
-          name: "Dog Food",
-          price: 200,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 2,
-          name: "Cat Toy",
-          price: 150,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 3,
-          name: "Bird Cage",
-          price: 500,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 4,
-          name: "Bird Cage",
-          price: 500,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 5,
-          name: "Bird Cage",
-          price: 500,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 6,
-          name: "Bird Cage",
-          price: 500,
-          image: "https://via.placeholder.com/150",
-        },
-        {
-          id: 7,
-          name: "Bird Cage",
-          price: 500,
-          image: "https://via.placeholder.com/150",
-        },
-      ]),
+      productTypesData: ref([]),
+      originalProducts: ref([]), // เก็บข้อมูลต้นฉบับ
       productName: "",
       productType: "",
-      productBrand: "",
     };
   },
+  async mounted() {
+    await this.fetchData();
+  },
   methods: {
+    async fetchData() {
+      try {
+        // Fetch product types
+        let cacheKey = "productTypesCache";
+        let cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          this.productTypesData = JSON.parse(cachedData);
+        } else {
+          try {
+            let response = await GetProductTypes();
+            this.productTypesData = response;
+            localStorage.setItem(cacheKey, JSON.stringify(response));
+          } catch (error) {
+            console.error("Error fetching product types:", error);
+          }
+        }
+
+        // Fetch products
+        cacheKey = "productsCache";
+        cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          this.originalProducts = JSON.parse(cachedData);
+        } else {
+          try {
+            let response = await GetProducts();
+            this.originalProducts = response;
+            localStorage.setItem(cacheKey, JSON.stringify(response));
+          } catch (error) {
+            console.error("Error fetching products:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Error in fetchData:", error);
+      }
+    },
     submitForm() {
-      // Handle form submission logic here
       console.log("Form submitted with:", {
         productName: this.productName,
         productType: this.productType,
-        productBrand: this.productBrand,
       });
-
-      // Reset form fields after submission
       this.resetForm();
     },
     resetForm() {
       this.productName = "";
       this.productType = "";
-      this.productBrand = "";
+    },
+  },
+  computed: {
+    filteredProducts() {
+      return this.originalProducts.filter((product) => {
+        return (
+          (!this.productName ||
+            product.product_name
+              .toLowerCase()
+              .includes(this.productName.toLowerCase())) &&
+          (!this.productType || product.product_type_id == this.productType)
+        );
+      });
     },
   },
 };

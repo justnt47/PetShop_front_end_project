@@ -6,12 +6,25 @@ axios.defaults.withCredentials = true;
 const apiPort = import.meta.env.VITE_API_PORT || 3000;
 const apiUrl = `http://localhost:${apiPort}`;
 
-export const GetProducts = async () => {
-    const url = `${apiUrl}/products`;
+export const GetProducts = async (data) => {
+    const cacheKey = "productsCache";
+    const cachedData = localStorage.getItem(cacheKey);
 
+    if (cachedData) {
+        console.log("Using cached data");
+        return JSON.parse(cachedData);
+    }
+    const url = `${apiUrl}/getProducts`;
+    const token = Cookies.get('token');
     try {
-        const response = await axios.get(url);
-        console.log(response.data);
+        console.log(data);
+        const response = await axios.post(url, data, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        localStorage.setItem(cacheKey, JSON.stringify(response.data)); // Cache the response
+        console.log("Fetched from API:", response.data);
         return response.data;
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
@@ -30,6 +43,9 @@ export const AddProduct = async (data) => {
                 Authorization: `Bearer ${token}`
             }
         })
+        if(response.status === 200){
+            localStorage.removeItem("productsCache");
+        }
         console.log(response.data);
         return response.data;
     } catch (error) {

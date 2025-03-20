@@ -15,6 +15,7 @@ import MainLayout from "../MainLayout.vue";
 import NotFound from "../page/NotFound.vue";
 import CartHistory from "@/components/Settings/CartHistory.vue";
 import CartHistoryDetail from '../page/Cart/CartHistoryDetail/page.vue';
+import EditProductPage from "@/components/Settings/EditProductPage.vue";
 
 const routes = [
 
@@ -79,6 +80,12 @@ const routes = [
             path: '/Settings/Cart-History/Detail',
             name:'CartHistoryDetail',
             component: CartHistoryDetail ,
+          },
+          {
+            path: "/edit-product",
+            name: "EditProductPage",
+            component: EditProductPage,
+            props: (route) => ({ product: route.params.product }), // Pass product as a prop
           },
         ]
       },

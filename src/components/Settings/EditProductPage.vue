@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2 class="pb-3">Add Product</h2>
+    <h2 class="pb-3">Edit Product</h2>
 
     <div class="card p-4">
       <div class="row">
@@ -180,15 +180,25 @@ import { GetProductTypes } from "@/functions/MasterData/MasterData";
 
 export default {
   name: "AddProductPage",
+  props: {
+    product: {
+      type: Object,
+      required: true,
+    },
+  },
   setup() {
     const productTypesData = ref([]);
 
-    const imageUrl = ref(null);
+    const imageUrl = ref(
+      props.product.product_image
+        ? `data:image/png;base64,${props.product.product_image}`
+        : null
+    );
     const selectedFile = ref(null);
-    const productName = ref("");
-    const productPrice = ref(null);
-    const productDtl = ref("");
-    const productType = ref("");
+    const productName = ref(props.product.product_name || "");
+    const productPrice = ref(props.product.product_price || null);
+    const productDtl = ref(props.product.product_detail || "");
+    const productType = ref(props.product.product_type_id || "");
     const isDragging = ref(false);
     const fileInput = ref(null);
     const convertedImageUrl = ref(null);
@@ -262,10 +272,10 @@ export default {
     const resetForm = () => {
       imageUrl.value = null;
       selectedFile.value = null;
-      productName.value = "";
-      productPrice.value = null;
-      productDtl.value = "";
-      productType.value = "";
+      productName.value = props.product.product_name || "";
+      productPrice.value = props.product.product_price || null;
+      productDtl.value = props.product.product_detail || "";
+      productType.value = props.product.product_type_id || "";
       convertedImageUrl.value = null;
       fileInputError.value = false;
     };

@@ -19,18 +19,22 @@
       </template>
 
       <div class="row my-auto g-4 py-5 d-flex justify-content-center">
+        <!-- <pre>this is pre{{ product }}</pre> -->
         <div class="col-6 text-center">
-          <img src="" alt="Product Image" class="img-fluid" />
+          <img
+            :src="
+              product.product_image
+                ? `data:image/png;base64,${product.product_image}`
+                : 'https://via.placeholder.com/150'
+            "
+            alt="Product Image"
+            class="img-fluid"
+          />
         </div>
         <div class="col-4">
-          <h1>{{ id }}</h1>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere aut
-            ducimus amet, repellendus voluptatem laborum corrupti dolores
-            dignissimos omnis magni quisquam eaque nesciunt illo nemo, fuga
-            error, pariatur repellat libero!
-          </p>
-          <strong>Price: ฿</strong>
+          <h1>{{ product.product_name }}</h1>
+          <p>{{ product.product_detail }}</p>
+          <strong>Price: ฿{{ product.product_price }}</strong>
           <button
             type="button"
             class="btn btn-primary btn-lg btn-block w-100 rounded-5 my-5"
@@ -42,8 +46,8 @@
     </b-skeleton-wrapper>
   </div>
 </template>
-  
-  <script>
+<script>
+import { ref } from "vue";
 import { BSkeletonWrapper, BSkeleton } from "bootstrap-vue-3";
 
 export default {
@@ -52,26 +56,60 @@ export default {
     BSkeletonWrapper,
     BSkeleton,
   },
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-  },
   data() {
     return {
-      loading: true, // Set this to false when data is loaded
+      loading: true,
+      product: null, // ตั้งค่าเป็น null ก่อน
+      originalProducts: [], // เก็บข้อมูลจาก cache
     };
   },
   mounted() {
-    // Simulate data loading
-    setTimeout(() => {
-      this.loading = false;
-    }, 1000);
+    this.fetchData();
+  },
+  methods: {
+    async fetchData() {
+      try {
+        let cacheKey = "productsCache";
+        let cachedData = localStorage.getItem(cacheKey);
+
+        if (cachedData) {
+          this.originalProducts = JSON.parse(cachedData);
+        }
+
+        // ดึงค่า id จาก route params
+        let productId = this.$route.params.id;
+        console.log(`productId = ${productId}`);
+
+        // ค้นหาสินค้าใน cache
+        let foundProduct = this.originalProducts.find(
+          (product) => product.product_id == parseInt(productId)
+        );
+
+        if (foundProduct) {
+          this.product = foundProduct;
+        } else {
+          console.error("Product not found in cache");
+        }
+
+        if (foundProduct) {
+          this.product = foundProduct;
+          setTimeout(() => {
+            this.loading = false;
+          }, 1000);
+        } else {
+          console.error("Product not found in cache");
+          // Redirect to Not Found page
+          this.$router.push({ name: "NotFound" });
+        }
+      } catch (error) {
+        console.log("Error fetching data from cache:", error);
+      }
+    },
   },
 };
 </script>
+
   
-  <style scoped>
+<style scoped>
 /* Add any additional styling here if needed */
 </style>
