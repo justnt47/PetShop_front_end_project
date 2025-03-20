@@ -12,31 +12,19 @@
       <div class="row mb-3">
         <label class="col-sm-4 col-form-label">Name</label>
         <div class="col-sm-4">
-          <input
-            v-model="userInfo.name"
-            class="form-control"
-            placeholder="Name"
-          />
+          <input v-model="fName" class="form-control" placeholder="Name" />
         </div>
       </div>
       <div class="row mb-3">
         <label class="col-sm-4 col-form-label">Surname</label>
         <div class="col-sm-4">
-          <input
-            v-model="userInfo.surName"
-            class="form-control"
-            placeholder="Surname"
-          />
+          <input v-model="lName" class="form-control" placeholder="Surname" />
         </div>
       </div>
       <div class="row mb-3">
         <label class="col-sm-4 col-form-label">Email</label>
         <div class="col-sm-4">
-          <input
-            v-model="userInfo.email"
-            class="form-control"
-            placeholder="Email"
-          />
+          <input v-model="email" class="form-control" placeholder="Email" />
         </div>
       </div>
       <div class="text-end">
@@ -51,13 +39,13 @@
     <div v-else>
       <div class="row">
         <p class="col-sm-4">Name</p>
-        <p class="col-sm-6">{{ userInfo.name }}</p>
+        <p class="col-sm-6">{{ fName || "N/A" }}</p>
 
         <p class="col-sm-4">Surname</p>
-        <p class="col-sm-6">{{ userInfo.surName }}</p>
+        <p class="col-sm-6">{{ lName || "N/A" }}</p>
 
         <p class="col-sm-4">Email</p>
-        <p class="col-sm-6">{{ userInfo.email }}</p>
+        <p class="col-sm-6">{{ email || "N/A" }}</p>
       </div>
     </div>
   </div>
@@ -66,17 +54,19 @@
 <script>
 import Swal from "sweetalert2";
 
+import { getCookie } from "@/functions/Cookie/Cookie.js";
+import { UpdateUser } from "@/functions/User/User.js";
+
 export default {
   name: "PersonalCard",
 
   data() {
+    const userInfo = getCookie() || { fName: "", lName: "", Email: "" };
     return {
       isEditing: false,
-      userInfo: {
-        name: "John",
-        surName: "Doe",
-        email: "john.doe@example.com",
-      },
+      fName: userInfo.fName,
+      lName: userInfo.lName,
+      email: userInfo.Email,
     };
   },
   methods: {
@@ -91,11 +81,25 @@ export default {
         showCancelButton: true,
         confirmButtonText: "Yes, save it!",
         cancelButtonText: "No, cancel!",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.isEditing = false;
-          // Add your save logic here
-          Swal.fire("Saved!", "Your information has been saved.", "success");
+          const updatedUser = {
+            fName: this.fName,
+            lName: this.lName,
+            email: this.email,
+          };
+          const response = await UpdateUser(updatedUser);
+          console.log(`response`, response);
+          if (response.status === 200) {
+            this.isEditing = false;
+            Swal.fire("Saved!", "Your information has been saved.", "success");
+          } else {
+            Swal.fire(
+              "Error!",
+              response.message || "Failed to update your information.",
+              "error"
+            );
+          }
         }
       });
     },

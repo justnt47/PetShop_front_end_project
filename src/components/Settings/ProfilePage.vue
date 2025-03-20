@@ -17,10 +17,6 @@ export default {
   data() {
     return {
       isEditing: false,
-      userInfo: {
-        name: "John Doe",
-        email: "john.doe@example.com",
-      },
     };
   },
   methods: {},
