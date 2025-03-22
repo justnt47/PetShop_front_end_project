@@ -44,6 +44,12 @@
 </template>
 
 <script>
+import { ref } from "vue";
+
+import Swal from "sweetalert2";
+
+import { DelProduct } from "@/functions/Product/Product.js";
+
 export default {
   name: "ManageProductCard",
   props: {
@@ -68,11 +74,44 @@ export default {
     editProduct(id) {
       this.$router.push({
         name: "EditProductPage",
-        params: { product: this.product },
+        params: { id },
+        state: { product: this.product },
       });
     },
     deleteProduct(id) {
-      console.log("Delete product with id:", id);
+      const data = {
+        product_id: id,
+      };
+      console.table(data);
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          DelProduct(data)
+            .then((response) => {
+              console.log(response);
+              Swal.fire(
+                "Deleted!",
+                "Your file has been deleted.",
+                "success"
+              ).then(() => {
+                window.location.reload();
+              });
+              this.$emit("delete-product", id);
+            })
+            .catch((error) => {
+              console.error(error);
+              Swal.fire("Error!", "Something went wrong.", "error");
+            });
+        }
+      });
     },
   },
 };

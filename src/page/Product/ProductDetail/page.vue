@@ -29,6 +29,7 @@
             "
             alt="Product Image"
             class="img-fluid"
+            style="max-height: 60vh; min-height: 60vh"
           />
         </div>
         <div class="col-4">

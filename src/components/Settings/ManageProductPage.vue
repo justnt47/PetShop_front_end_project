@@ -59,7 +59,7 @@
 
 <script>
 import { ref, computed } from "vue";
-import ManageProductCard from "../../components/Settings/ManageProductCard.vue";
+import ManageProductCard from "./ManageProductCard.vue";
 import { GetProducts } from "@/functions/Product/Product";
 import { GetProductTypes } from "@/functions/MasterData/MasterData";
 

@@ -7,7 +7,7 @@
             <div class="col-md-3 my-4" style="padding-top: 0vh">
               <div class="mt-5 list-group list-group-flush">
                 <router-link
-                  to="/Settings/Mange-Product"
+                  to="/Settings/Manage-Product"
                   class="list-group-item list-group-item-action"
                   >Manage Product</router-link
                 >

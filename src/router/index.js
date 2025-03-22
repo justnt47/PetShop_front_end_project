@@ -8,7 +8,7 @@ import ProductDetailPage from '../page/Product/ProductDetail/page.vue';
 import CartPage from '../page/Cart/page.vue';
 import ProfilePage from '../components/Settings/ProfilePage.vue';
 import ChangePwdPage from '../components/Settings/FormChangePwd.vue';
-import MangeProductPage from '../components/Settings/MangeProductPage.vue';
+import ManageProductPage from '../components/Settings/ManageProductPage.vue';
 import AddProductPage from '../components/Settings/AddProductPage.vue';
 import SettingsPage from '../page/Settings/page.vue';
 import MainLayout from "../MainLayout.vue";
@@ -61,9 +61,9 @@ const routes = [
             component: ChangePwdPage 
           },
           { 
-            path: '/Settings/Mange-Product',
-            name:'MangeProductPage',
-            component: MangeProductPage 
+            path: '/Settings/Manage-Product',
+            name:'ManageProductPage',
+            component: ManageProductPage 
           },
           {
             path: '/Settings/Cart-History',
@@ -82,10 +82,10 @@ const routes = [
             component: CartHistoryDetail ,
           },
           {
-            path: "/edit-product",
+            path: "/edit-product/:id",
             name: "EditProductPage",
             component: EditProductPage,
-            props: (route) => ({ product: route.params.product }), // Pass product as a prop
+            props: true, // Pass product as a prop
           },
         ]
       },

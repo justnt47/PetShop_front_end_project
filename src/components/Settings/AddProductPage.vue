@@ -144,13 +144,16 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="text-end mt-3">
+          <div class="d-flex justify-content-end gap-2">
             <button
               type="button"
-              class="btn btn-secondary me-2"
-              @click="resetForm"
+              class="btn btn-secondary"
+              @click="navigateToManageProductPage"
             >
               <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-warning" @click="resetForm">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
             </button>
             <button type="button" class="btn btn-success" @click="validateForm">
               <i class="bi bi-check-circle"></i> Save
@@ -160,14 +163,14 @@
       </div>
 
       <!-- Section to Display Converted Image -->
-      <div v-if="convertedImageUrl" class="mt-4">
+      <!-- <div v-if="convertedImageUrl" class="mt-4">
         <h3>Converted Image</h3>
         <img
           :src="convertedImageUrl"
           alt="Converted Image"
           class="img-thumbnail"
         />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -177,10 +180,12 @@ import { onMounted, ref } from "vue";
 import Swal from "sweetalert2";
 import { AddProduct } from "@/functions/Product/Product";
 import { GetProductTypes } from "@/functions/MasterData/MasterData";
+import { useRouter } from "vue-router";
 
 export default {
   name: "AddProductPage",
   setup() {
+    const router = useRouter();
     const productTypesData = ref([]);
 
     const imageUrl = ref(null);
@@ -359,6 +364,10 @@ export default {
       }
     };
 
+    const navigateToManageProductPage = () => {
+      router.push({ name: "ManageProductPage" });
+    };
+
     return {
       productTypesData,
       imageUrl,
@@ -383,6 +392,7 @@ export default {
       productPriceError,
       fileInputError,
       validateForm,
+      navigateToManageProductPage,
     };
   },
 };

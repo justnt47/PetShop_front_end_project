@@ -28,7 +28,7 @@
         "
         class="card-img-top"
         alt="404 Not found"
-        style="max-height: 30vh; min-height: 30vh"
+        style="max-height: 45vh; min-height: 45vh"
       />
       <div class="card-body">
         <h1 class="card-title text-start fs-6 fw-bold mt-3">

@@ -22,8 +22,8 @@
           >
             <!-- Show image preview if available -->
             <img
-              v-if="imageUrl"
-              :src="imageUrl"
+              v-if="imageUrl || base64Image"
+              :src="imageUrl || `data:image/png;base64,${base64Image}`"
               alt="Image Preview"
               class="img-thumbnail"
               style="max-height: 100%; max-width: 100%"
@@ -45,7 +45,7 @@
           </div>
 
           <!-- Remove Image Button -->
-          <div v-if="imageUrl" class="text-center mt-2">
+          <div v-if="imageUrl || base64Image" class="text-center mt-2">
             <button type="button" class="btn btn-danger" @click="removeImage">
               <i class="bi bi-trash"></i> Remove
             </button>
@@ -144,13 +144,16 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="text-end mt-3">
+          <div class="d-flex justify-content-end gap-2">
             <button
               type="button"
-              class="btn btn-secondary me-2"
-              @click="resetForm"
+              class="btn btn-secondary"
+              @click="navigateToManageProductPage"
             >
               <i class="bi bi-x-circle"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-warning" @click="resetForm">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
             </button>
             <button type="button" class="btn btn-success" @click="validateForm">
               <i class="bi bi-check-circle"></i> Save
@@ -174,31 +177,35 @@
 
 <script>
 import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
 import Swal from "sweetalert2";
-import { AddProduct } from "@/functions/Product/Product";
+
+import {
+  AddProduct,
+  GetProducts,
+  UpdateProduct,
+} from "@/functions/Product/Product";
 import { GetProductTypes } from "@/functions/MasterData/MasterData";
 
 export default {
   name: "AddProductPage",
-  props: {
-    product: {
-      type: Object,
-      required: true,
-    },
-  },
+  props: ["id"],
   setup() {
-    const productTypesData = ref([]);
+    const route = useRoute();
+    const router = useRouter();
 
-    const imageUrl = ref(
-      props.product.product_image
-        ? `data:image/png;base64,${props.product.product_image}`
-        : null
-    );
+    const productTypesData = ref([]);
+    const originalProducts = ref([]);
+    const product = ref({});
+
+    const imageUrl = ref(null);
     const selectedFile = ref(null);
-    const productName = ref(props.product.product_name || "");
-    const productPrice = ref(props.product.product_price || null);
-    const productDtl = ref(props.product.product_detail || "");
-    const productType = ref(props.product.product_type_id || "");
+    const base64Image = ref(null);
+    const productName = ref("");
+    const productPrice = ref(null);
+    const productDtl = ref("");
+    const productType = ref("");
     const isDragging = ref(false);
     const fileInput = ref(null);
     const convertedImageUrl = ref(null);
@@ -210,8 +217,12 @@ export default {
     const fileInputError = ref(false);
 
     onMounted(async () => {
-      const cacheKey = "productTypesCache";
-      const cachedData = localStorage.getItem(cacheKey);
+      fetchData();
+    });
+
+    const fetchData = async () => {
+      let cacheKey = "productTypesCache";
+      let cachedData = localStorage.getItem(cacheKey);
 
       if (cachedData) {
         console.log("Using cached data");
@@ -225,26 +236,63 @@ export default {
           console.error("Error fetching product types:", error);
         }
       }
-    });
 
+      cacheKey = "productsCache";
+      cachedData = localStorage.getItem(cacheKey);
+
+      if (cachedData) {
+        originalProducts.value = JSON.parse(cachedData);
+      } else {
+        originalProducts.value = await GetProducts();
+      }
+
+      // ดึงค่า id จาก route params
+      const productId = route.params.id;
+      console.log(`productId = ${productId}`);
+
+      // ค้นหาสินค้าใน cache
+      let foundProduct = originalProducts.value.find(
+        (product) => product.product_id == parseInt(productId)
+      );
+
+      if (foundProduct) {
+        product.value = foundProduct;
+
+        productName.value = product.value.product_name;
+        productPrice.value = product.value.product_price;
+        productDtl.value = product.value.product_detail;
+        productType.value = product.value.product_type_id;
+        base64Image.value = product.value.product_image;
+        imageUrl.value = null;
+
+        console.log(product.value);
+      } else {
+        console.error("Product not found in cache");
+      }
+    };
     // Handle file preview when uploaded via click or drag & drop
     const previewImage = (event) => {
       const file = event.target.files[0];
-      if (file) {
+      if (file && file.type.startsWith("image/")) {
         selectedFile.value = file;
         imageUrl.value = URL.createObjectURL(file);
         fileInputError.value = false;
+      } else {
+        fileInputError.value = true;
+        Swal.fire("Error!", "Please upload an image file.", "error");
       }
     };
 
-    // Drag & Drop: Handle file drop
     const handleDrop = (event) => {
       isDragging.value = false;
       const file = event.dataTransfer.files[0];
-      if (file) {
+      if (file && file.type.startsWith("image/")) {
         selectedFile.value = file;
         imageUrl.value = URL.createObjectURL(file);
         fileInputError.value = false;
+      } else {
+        fileInputError.value = true;
+        Swal.fire("Error!", "Please upload an image file.", "error");
       }
     };
 
@@ -266,18 +314,24 @@ export default {
     // Remove image preview
     const removeImage = () => {
       imageUrl.value = null;
+      base64Image.value = null;
       selectedFile.value = null;
     };
 
     const resetForm = () => {
       imageUrl.value = null;
+      base64Image.value = product.value.product_image || null;
       selectedFile.value = null;
-      productName.value = props.product.product_name || "";
-      productPrice.value = props.product.product_price || null;
-      productDtl.value = props.product.product_detail || "";
-      productType.value = props.product.product_type_id || "";
+      productName.value = product.value.product_name || "";
+      productPrice.value = product.value.product_price || null;
+      productDtl.value = product.value.product_detail || "";
+      productType.value = product.value.product_type_id || "";
       convertedImageUrl.value = null;
       fileInputError.value = false;
+      productNameError.value = false;
+      productTypeError.value = false;
+      productDtlError.value = false;
+      productPriceError.value = false;
     };
 
     const convertToBlob = (file) => {
@@ -315,30 +369,25 @@ export default {
     };
 
     const saveProduct = async () => {
-      const uploadedImageUrl = await uploadImage(selectedFile.value);
-
-      if (!uploadedImageUrl) {
-        console.error("Failed to upload image");
-        return;
-      }
-
       const productData = {
         product_name: productName.value,
         product_detail: productDtl.value,
-        product_image: uploadedImageUrl.base64,
+        product_image: base64Image.value,
         product_type_id: productType.value,
         product_price: productPrice.value,
+        product_id: product.value.product_id,
       };
       console.log(`productData`, productData);
 
       // Convert base64 back to image URL for testing
-      convertedImageUrl.value = base64ToImage(uploadedImageUrl.base64);
-      console.log(`convertedImageUrl`, convertedImageUrl.value);
+      // convertedImageUrl.value = base64ToImage(uploadedImageUrl.base64);
+      // console.log(`convertedImageUrl`, convertedImageUrl.value);
 
       try {
-        const response = await AddProduct(productData);
+        const response = await UpdateProduct(productData);
         if (response.status === 200) {
           Swal.fire("Saved!", "Your product has been added.", "success");
+          fetchData();
           resetForm();
         } else {
           Swal.fire("Error!", response.data.error, "error");
@@ -349,12 +398,13 @@ export default {
       }
     };
 
-    const validateForm = () => {
+    const validateForm = async () => {
       productNameError.value = !productName.value;
       productTypeError.value = !productType.value;
       productDtlError.value = !productDtl.value;
-      productPriceError.value = !productPrice.value;
-      fileInputError.value = !selectedFile.value;
+      productPriceError.value =
+        !productPrice.value || isNaN(productPrice.value);
+      fileInputError.value = !base64Image.value && !selectedFile.value;
 
       if (
         productNameError.value ||
@@ -365,10 +415,20 @@ export default {
       ) {
         return false;
       } else {
-        saveProduct();
+        if (selectedFile.value) {
+          console.log(selectedFile.value);
+          const uploadedImageUrl = await uploadImage(selectedFile.value);
+          imageUrl.value = uploadedImageUrl.base64;
+          base64Image.value = uploadedImageUrl.base64;
+        }
+
+        console.log(`product_image: `, imageUrl.value);
+        await saveProduct();
       }
     };
-
+    const navigateToManageProductPage = () => {
+      router.push({ name: "ManageProductPage" });
+    };
     return {
       productTypesData,
       imageUrl,
@@ -376,6 +436,7 @@ export default {
       productPrice,
       productDtl,
       productType,
+      base64Image,
       saveProduct,
       resetForm,
       previewImage,
@@ -393,6 +454,8 @@ export default {
       productPriceError,
       fileInputError,
       validateForm,
+      fetchData,
+      navigateToManageProductPage,
     };
   },
 };

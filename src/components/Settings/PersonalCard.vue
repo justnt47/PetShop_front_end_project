@@ -54,6 +54,7 @@
 <script>
 import Swal from "sweetalert2";
 
+import { EventBus } from "@/event-bus.js";
 import { getCookie } from "@/functions/Cookie/Cookie.js";
 import { UpdateUser } from "@/functions/User/User.js";
 
@@ -92,6 +93,7 @@ export default {
           console.log(`response`, response);
           if (response.status === 200) {
             this.isEditing = false;
+            EventBus.emit("user-updated");
             Swal.fire("Saved!", "Your information has been saved.", "success");
           } else {
             Swal.fire(
