@@ -39,6 +39,7 @@
           <button
             type="button"
             class="btn btn-primary btn-lg btn-block w-100 rounded-5 my-5"
+            @click="addCart"
           >
             เพิ่มลงตะกร้า
           </button>
@@ -50,6 +51,10 @@
 <script>
 import { ref } from "vue";
 import { BSkeletonWrapper, BSkeleton } from "bootstrap-vue-3";
+import Swal from "sweetalert2";
+
+import { getCookie } from "@/functions/Cookie/Cookie";
+import { chkcart, addcart, addcartdtl } from "@/functions/Cart/Cart";
 
 export default {
   name: "ProductDetailPage",
@@ -104,6 +109,37 @@ export default {
         }
       } catch (error) {
         console.log("Error fetching data from cache:", error);
+      }
+    },
+
+    async addCart() {
+      let decoded = getCookie();
+
+      let product_id = this.product.product_id;
+      let product_name = this.product.product_name;
+
+      console.log(`check`);
+      let cart_id = await chkcart();
+      console.log(`cart_id = ${cart_id.cartId}`);
+      if (!cart_id.cartId) {
+        console.log(`addcart`);
+        cart_id = await addcart(decoded.user_id);
+      }
+      const crtId = cart_id.cartId;
+      console.log(crtId, product_id);
+      const data = {
+        cart_id: crtId,
+        product_id: product_id,
+      };
+      let cart_dtl_id = await addcartdtl(data);
+      if (cart_dtl_id) {
+        this.$router.push({ name: "CartPage" });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to add product to cart. Please try again.",
+        });
       }
     },
   },
