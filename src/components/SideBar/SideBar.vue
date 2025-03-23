@@ -28,9 +28,10 @@
         >
           <i class="bi bi-cart fs-4"></i>
           <span
+            v-if="totalCartQty > 0 && decodedToken"
             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
           >
-            12
+            {{ totalCartQty }}
             <span class="visually-hidden">unread messages</span>
           </span>
         </router-link>
@@ -82,9 +83,10 @@
             >
               <i class="bi bi-cart fs-4"></i>
               <span
+                v-if="totalCartQty > 0 && decodedToken"
                 class="position-absolute start-100 translate-middle badge rounded-pill bg-danger"
               >
-                12
+                {{ totalCartQty }}
                 <span class="visually-hidden">unread messages</span>
               </span>
             </router-link>
@@ -147,6 +149,7 @@ import { Dropdown } from "bootstrap";
 import { getCookie } from "@/functions/Cookie/Cookie";
 import { EventBus } from "@/event-bus";
 import { Logout } from "@/functions/User/User";
+import { getCartDtl } from "@/functions/Cart/Cart";
 
 export default {
   name: "Navbar",
@@ -161,7 +164,16 @@ export default {
       isSticky: ref(false),
       isTransparent: ref(false),
       decodedToken: ref(getCookie()),
+      cartList: ref([]),
     };
+  },
+  computed: {
+    totalCartQty() {
+      // Use the qty field directly from cartList
+      return Object.values(this.cartList).reduce((total, cart) => {
+        return total + parseInt(cart.qty, 10); // Sum up the qty values
+      }, 0);
+    },
   },
   methods: {
     handleScroll() {
@@ -178,13 +190,36 @@ export default {
       Logout();
       EventBus.emit("logout"); // Notify other components
     },
-    updateUserData() {
+    async updateUserData() {
       this.decodedToken = getCookie(); // Get the latest token
       if (this.decodedToken) {
         this.user.fname = this.decodedToken.fName;
         this.user.lname = this.decodedToken.lName;
         this.user.email = this.decodedToken.Email;
         this.user.role = this.decodedToken.roleEN;
+
+        const cachedCartDetails = localStorage.getItem("cartDetails");
+        if (cachedCartDetails) {
+          console.log("Using cached cart details");
+          const cacheData = JSON.parse(cachedCartDetails);
+          this.cartList = cacheData.cartList;
+          console.table(this.cartList);
+        } else {
+          console.log("Fetching cart details from API");
+          try {
+            const response = await getCartDtl();
+            if (response.status === 200) {
+              this.cartList = response.data.cartList;
+              console.table(this.cartList);
+              localStorage.setItem(
+                "cartDetails",
+                JSON.stringify(response.data)
+              ); // Cache the data
+            }
+          } catch (error) {
+            console.error("Error fetching cart details:", error);
+          }
+        }
       } else {
         this.user = { fname: "", lname: "", email: "", role: "" }; // Clear data on logout
       }
@@ -203,6 +238,9 @@ export default {
     EventBus.on("logout", () => {
       this.updateUserData(); // Update component when logout event occurs
     });
+    EventBus.on("updated-cart", () => {
+      this.updateUserData();
+    });
 
     // Watch for changes in decodedToken
     watch(
@@ -215,6 +253,7 @@ export default {
   unmounted() {
     window.removeEventListener("scroll", this.handleScroll);
     EventBus.off("logout"); // Cleanup event listener
+    EventBus.off("updated-cart"); // Cleanup event listener
   },
 };
 </script>
