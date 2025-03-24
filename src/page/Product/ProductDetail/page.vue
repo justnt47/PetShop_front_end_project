@@ -67,6 +67,7 @@ export default {
       loading: true,
       product: null, // ตั้งค่าเป็น null ก่อน
       originalProducts: [], // เก็บข้อมูลจาก cache
+      decodetoken: getCookie(),
     };
   },
   mounted() {
@@ -113,8 +114,8 @@ export default {
     },
 
     async addCart() {
-      let decoded = getCookie();
-
+      console.log(`decodetoken = ${this.decodetoken.userId}`);
+      let decoded = this.decodetoken;
       let product_id = this.product.product_id;
       let product_name = this.product.product_name;
 
@@ -123,17 +124,18 @@ export default {
       console.log(`cart_id = ${cart_id.cartId}`);
       if (!cart_id.cartId) {
         console.log(`addcart`);
-        cart_id = await addcart(decoded.user_id);
+        console.log(`decoded.user_id = ${decoded.userId}`);
+        cart_id = await addcart(decoded.userId);
       }
       const crtId = cart_id.cartId;
-      console.log(crtId, product_id);
+      console.log(`crtId = ${crtId} product_id = ${product_id}`);
       const data = {
         cart_id: crtId,
         product_id: product_id,
       };
       let cart_dtl_id = await addcartdtl(data);
       if (cart_dtl_id) {
-        this.$router.push({ name: "CartPage" });
+        // this.$router.push({ name: "CartPage" });
       } else {
         Swal.fire({
           icon: "error",

@@ -82,7 +82,7 @@ export default {
       const data = {
         product_id: id,
       };
-      console.table(data);
+      // console.table(data);
 
       Swal.fire({
         title: "Are you sure?",
