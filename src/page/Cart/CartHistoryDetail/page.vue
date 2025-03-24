@@ -1,67 +1,118 @@
 <template>
-  <!-- Master --><!-- ถ้าค่าที่อยู่ใน Cookie กับ CusId ไม่ตรงกันแสดงว่าไม่ใช้ผู้ซื้อไม่มีสิทธิอ่าน -->
-  <div v-if="memEmail == cusId">
-    <div v-for="(ct, cartId) in cart" :key="cartId" class="mt-5">
-      <div class="card bg-light">
-        <div class="card-body">
-          <h4 class="card-title text-primary opacity-75">
-            คำสั่งซื้อเลขที่ {{ ct.cartId }}
-          </h4>
-          <h5 class="card-subtitle mt-2 text-muted">
-            สั่งซื้อวันที่ {{ formattedDate(ct.cartDate) }}
-          </h5>
-          <div class="text-danger text-end">
-            จำนวนสินค้า {{ ct.sqty }} ชิ้น, ยอดเงิน
-            {{ (ct.sprice ?? 0).toLocaleString() }} บาท
-          </div>
-          <hr />
-        </div>
+  <div class="container">
+    <router-link
+      :to="{ name: 'CartHistory' }"
+      class="btn btn-outline-secondary mb-4"
+    >
+      <i class="bi bi-chevron-left"></i> กลับสู่หน้ารายการตะกร้า
+    </router-link>
+    <div v-if="isLoading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-      <!--card-->
     </div>
-    <!---v for  -->
 
-    <!-- Detail -->
-    <table class="table mt-3">
-      <thead>
-        <tr class="bg-secondary bg-opacity-10">
-          <td></td>
-          <td></td>
-          <td>สินค้า</td>
-          <td class="text-end">ราคาต่อหน่วย</td>
-          <td class="text-center">จำนวน</td>
-          <td class="text-end">เป็นเงิน</td>
-          <td></td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(ctd, pdId) in cartDtl" :key="pdId">
-          <td>{{ ctd.row_number }}</td>
-          <td><!-- {{ ctd.pdId }} --></td>
-          <td>{{ ctd.pdName }}</td>
-          <td class="text-end">{{ ctd.price }}</td>
-          <td class="text-center">{{ ctd.qty }}</td>
-          <td class="text-end">
-            {{ (ctd.price * ctd.qty ?? 0).toLocaleString() }}
-          </td>
-          <td class="text-center">
-            <i class="bi-x-lg text-danger"></i>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <!--v-if-->
-  <div v-else>
-    <div class="alert alert-danger mt-5">คุณไม่มีสิทธิ์ดูรายการนี้</div>
+    <div v-else-if="!formattedProducts.length" class="alert alert-warning mt-5">
+      ไม่พบข้อมูลสินค้าในตะกร้า
+    </div>
+
+    <div v-else>
+      <h4 class="mb-4">เลขที่ตะกร้า: {{ cartId }}</h4>
+
+      <table class="table table-hover mt-3">
+        <thead>
+          <tr class="bg-secondary bg-opacity-10">
+            <th width="5%">#</th>
+            <th>สินค้า</th>
+            <th width="15%" class="text-end">ราคาต่อหน่วย</th>
+            <th width="15%" class="text-center">จำนวน</th>
+            <th width="15%" class="text-end">เป็นเงิน</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="product in formattedProducts"
+            :key="`${product.product_id}-${product.rowNumber}`"
+          >
+            <td>{{ product.rowNumber }}</td>
+            <td>{{ product.product_name }}</td>
+            <td class="text-end">{{ formatCurrency(product.price) }}</td>
+            <td class="text-center">{{ product.qty }}</td>
+            <td class="text-end">
+              {{ formatCurrency(product.price * product.qty) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mt-4 text-end">
+        <h5>รวมเป็นเงิน: {{ formatCurrency(calculateTotal()) }} บาท</h5>
+      </div>
+    </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "CartHistoryDetailPage",
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const cartId = ref(route.params.cartId);
+const cartData = ref(null);
+const isLoading = ref(false);
+
+const formattedProducts = computed(() => {
+  if (!cartData.value?.productList) return [];
+
+  return Object.values(cartData.value.productList).map((product, index) => ({
+    ...product,
+    rowNumber: index + 1,
+  }));
+});
+
+const fetchCartData = async () => {
+  isLoading.value = true;
+  try {
+    const cartHistoryDetails = JSON.parse(
+      localStorage.getItem("cartHistoryDetails")
+    ).data;
+
+    if (cartHistoryDetails?.cartList?.[cartId.value]) {
+      cartData.value = cartHistoryDetails.cartList[cartId.value];
+    }
+  } catch (error) {
+    console.error("Error fetching cart data:", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
+
+const formatCurrency = (value) => {
+  const num = Number(value) || 0;
+  return num.toLocaleString("th-TH", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const calculateTotal = () => {
+  return formattedProducts.value.reduce(
+    (sum, product) => sum + product.price * product.qty,
+    0
+  );
+};
+
+onMounted(() => {
+  fetchCartData();
+});
 </script>
 
-<style>
+<style scoped>
+.table th {
+  font-weight: 500;
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
 </style>

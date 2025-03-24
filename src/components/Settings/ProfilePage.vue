@@ -8,6 +8,7 @@
 </template>
   
 <script>
+
 import PersonalCard from "./PersonalCard.vue";
 export default {
   name: "ProfilePage",

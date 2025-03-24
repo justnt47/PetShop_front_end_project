@@ -23,7 +23,7 @@
 
       <div class="d-flex align-items-center">
         <router-link
-          :to="{ name: 'CartPage' }"
+          :to="decodedToken ? { name: 'CartPage' } : { name: 'Login' }"
           class="nav-link position-relative d-lg-none"
         >
           <i class="bi bi-cart fs-4"></i>
@@ -78,7 +78,7 @@
 
           <div class="d-flex align-items-center gap-3">
             <router-link
-              :to="{ name: 'CartPage' }"
+              :to="decodedToken ? { name: 'CartPage' } : { name: 'Login' }"
               class="nav-link position-relative d-lg-block d-none"
             >
               <i class="bi bi-cart fs-4"></i>

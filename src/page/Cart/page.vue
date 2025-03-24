@@ -4,7 +4,7 @@
 
   <!-- Detail -->
   <div class="container">
-    <table class="table mt-3">
+    <table class="table table-hover mt-3">
       <thead>
         <tr class="bg-secondary bg-opacity-10">
           <td></td>
@@ -74,6 +74,8 @@ import {
   updateCartItemQty,
   delCartItem,
   delCart,
+  confirmCart,
+  getCartHistoryDtl,
 } from "@/functions/Cart/Cart";
 import { getCookie } from "@/functions/Cookie/Cookie";
 export default {
@@ -99,25 +101,30 @@ export default {
     },
   },
   async mounted() {
-    // ตรวจสอบว่าเป็นเจ้าของตะกร้าหรือไม่
-    this.decodedToken = getCookie();
-    // this.cartId = this.$route.params.cartId;
-    const result = await getCartDtl();
-    this.cart = result.data;
+    console.log("Fetching cart data");
 
-    // Map cartList to cartDtl
-    const cartList = this.cart.cartList;
-    this.cartId = Object.keys(cartList)[0];
-    this.cartDtl = Object.entries(cartList).flatMap(([cartId, cartData]) =>
-      Object.values(cartData.productList).map((product, index) => ({
-        row_number: index + 1,
-        pdId: product.product_id,
-        pdName: product.product_name,
-        price: product.price,
-        qty: product.qty,
-        total: product.price * product.qty, // คำนวณ total เริ่มต้น
-      }))
-    );
+    this.decodedToken = getCookie();
+
+    if (!this.cart.length) {
+      // ป้องกันการโหลดซ้ำ
+      const result = await getCartDtl();
+      this.cart = result.data;
+
+      const cartList = this.cart.cartList;
+      if (cartList && Object.keys(cartList).length > 0) {
+        this.cartId = Object.keys(cartList)[0];
+        this.cartDtl = Object.entries(cartList).flatMap(([cartId, cartData]) =>
+          Object.values(cartData.productList).map((product, index) => ({
+            row_number: index + 1,
+            pdId: product.product_id,
+            pdName: product.product_name,
+            price: product.price,
+            qty: product.qty,
+            total: product.price * product.qty,
+          }))
+        );
+      }
+    }
   },
   methods: {
     increaseQty(pdId) {
@@ -134,7 +141,7 @@ export default {
         };
         console.log(data);
         updateCartItemQty(data);
-        this.updateCart(); // อัปเดทตะกร้าทันที
+        // this.updateCart(); // อัปเดทตะกร้าทันที
       }
     },
 
@@ -152,7 +159,7 @@ export default {
         };
         console.log(data);
         updateCartItemQty(data);
-        this.updateCart(); // อัปเดทตะกร้าทันที
+        // this.updateCart(); // อัปเดทตะกร้าทันที
       }
     },
 
@@ -172,7 +179,7 @@ export default {
             cart_id: this.cartId,
           };
           delCartItem(data);
-          this.updateCart();
+          // this.updateCart();
           Swal.fire("ลบสำเร็จ!", "สินค้าถูกลบออกจากตะกร้าแล้ว", "success");
         }
       });
@@ -224,14 +231,23 @@ export default {
         showCancelButton: true,
         confirmButtonText: "ใช่, สั่งซื้อเลย!",
         cancelButtonText: "ยกเลิก",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          // Simulate successful purchase
-          Swal.fire({
-            title: "ดำเนินการสั่งซื้อสำเร็จ!",
-            icon: "success",
-            confirmButtonText: "ตกลง",
-          });
+          const data = {
+            cart_id: this.cartId,
+          };
+          console.table(data);
+
+          const result = await confirmCart(data);
+          if (result.status == 200) {
+            Swal.fire({
+              title: "ดำเนินการสั่งซื้อสำเร็จ!",
+              icon: "success",
+              confirmButtonText: "ตกลง",
+            }).then(() => {
+              this.$router.push({ name: "CartHistory" });
+            });
+          }
         } else {
           // Optional: Handle cancellation
         }
@@ -240,4 +256,11 @@ export default {
   },
 };
 </script>
-  <style></style>
+  <style>
+.table th {
+  font-weight: 500;
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+</style>
