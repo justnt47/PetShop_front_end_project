@@ -203,14 +203,14 @@ export default {
           console.log("Using cached cart details");
           const cacheData = JSON.parse(cachedCartDetails);
           this.cartList = cacheData.cartList;
-          console.table(this.cartList);
+          // console.table(this.cartList);
         } else {
           console.log("Fetching cart details from API");
           try {
             const response = await getCartDtl();
             if (response.status === 200) {
               this.cartList = response.data.cartList;
-              console.table(this.cartList);
+              // console.table(this.cartList);
               localStorage.setItem(
                 "cartDetails",
                 JSON.stringify(response.data)

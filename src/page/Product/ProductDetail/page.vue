@@ -34,7 +34,7 @@
         </div>
         <div class="col-4">
           <h1>{{ product.product_name }}</h1>
-          <p>{{ product.product_detail }}</p>
+          <p style="min-height: 30vh">{{ product.product_detail }}</p>
           <strong>Price: ฿{{ product.product_price }}</strong>
           <button
             type="button"
