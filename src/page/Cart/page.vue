@@ -1,162 +1,140 @@
 <template>
-  <!-- <pre>{{ this.cart }}</pre> -->
-  <!-- Master --><!-- ถ้าค่าที่อยู่ใน Cookie กับ CusId ไม่ตรงกันแสดงว่าไม่ใช้ผู้ซื้อไม่มีสิทธิอ่าน -->
-
-  <!-- Detail -->
   <div class="container">
-    <table class="table mt-3">
-      <thead>
-        <tr class="bg-secondary bg-opacity-10">
-          <td></td>
-          <td></td>
-          <td>สินค้า</td>
-          <td class="text-end">ราคาต่อหน่วย</td>
-          <td class="text-center">จำนวน</td>
-          <td class="text-end">เป็นเงิน</td>
-          <td></td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(ctd, pdId) in cartDtl" :key="pdId">
-          <td>{{ ctd.row_number }}</td>
-          <td><!-- {{ ctd.pdId }} --></td>
-          <td>{{ ctd.pdName }}</td>
-          <td class="text-end">{{ ctd.price }}</td>
-          <td class="text-center">
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              @click="decreaseQty(ctd.pdId)"
-            >
-              -
-            </button>
-            <span class="mx-2">{{ ctd.qty }}</span>
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              @click="increaseQty(ctd.pdId)"
-            >
-              +
-            </button>
-          </td>
-          <td class="text-end">
-            {{ (ctd.price * ctd.qty ?? 0).toLocaleString() }}
-          </td>
-          <td class="text-center">
-            <button
-              type="button"
-              class="btn btn-danger bi bi-trash"
-              @click="removeItem(ctd.pdId)"
-            ></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <!-- Total Section -->
-    <div class="mt-3 text-end">
-      <p><strong>รวมจำนวนสินค้า:</strong> {{ totalQty }}</p>
-      <p><strong>รวมเป็นเงิน:</strong> {{ totalPrice.toLocaleString() }} บาท</p>
-      <button class="btn btn-danger me-2" @click="removeCart">
-        ลบตะกร้าสินค้า
-      </button>
-      <button class="btn btn-success" @click="proceedToBuy">สั่งซื้อ</button>
+    <div v-if="isAuthorized">
+      <table class="table mt-3">
+        <thead>
+          <tr class="bg-secondary bg-opacity-10">
+            <td></td>
+            <td></td>
+            <td>สินค้า</td>
+            <td class="text-end">ราคาต่อหน่วย</td>
+            <td class="text-center">จำนวน</td>
+            <td class="text-end">เป็นเงิน</td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(ctd, pdId) in cartDtl" :key="pdId">
+            <td>{{ ctd.row_number }}</td>
+            <td></td>
+            <td>{{ ctd.pdName }}</td>
+            <td class="text-end">{{ ctd.price }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-secondary" @click="decreaseQty(ctd.pdId)">-</button>
+              <span class="mx-2">{{ ctd.qty }}</span>
+              <button class="btn btn-sm btn-outline-secondary" @click="increaseQty(ctd.pdId)">+</button>
+            </td>
+            <td class="text-end">
+              {{ (ctd.price * ctd.qty ?? 0).toLocaleString() }}
+            </td>
+            <td class="text-center">
+              <button type="button" class="btn btn-danger bi bi-trash" @click="removeItem(ctd.pdId)"></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Total Section -->
+      <div class="mt-3 text-end">
+        <p><strong>รวมจำนวนสินค้า:</strong> {{ totalQty }}</p>
+        <p><strong>รวมเป็นเงิน:</strong> {{ totalPrice.toLocaleString() }} บาท</p>
+        <button class="btn btn-danger me-2" @click="removeCart">ลบตะกร้าสินค้า</button>
+        <button class="btn btn-success" @click="proceedToBuy">สั่งซื้อ</button>
+      </div>
+    </div>
+
+    <!-- ถ้าไม่มีสิทธิ์ -->
+    <div v-else class="alert alert-danger mt-5">
+      คุณไม่มีสิทธิ์ดูรายการนี้
     </div>
   </div>
 </template>
 
-
 <script>
-import { ref } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
 axios.defaults.withCredentials = true;
 
-import {
-  getCartDtl,
-  updateCartItemQty,
-  delCartItem,
-  delCart,
-} from "@/functions/Cart/Cart";
+import { getCartDtl, updateCartItemQty, delCartItem, delCart } from "@/functions/Cart/Cart";
 import { getCookie } from "@/functions/Cookie/Cookie";
+
 export default {
   name: "CartPage",
   data() {
     return {
-      cart: [], //รับข้อมูล Master
-      cartDtl: [], //รับข้อมูล Detail
+      cart: [], 
+      cartDtl: [], 
       cartId: null,
-      memEmail: null,
-      decodedToken: null,
-      cusId: null,
+      memEmail: null, // Email ผู้ใช้ที่ล็อกอิน
+      cusId: null, // Email เจ้าของตะกร้า
+      isAuthorized: false, // ตรวจสอบสิทธิ์
     };
   },
   computed: {
     totalQty() {
-      if (!this.cartDtl || this.cartDtl.length === 0) return 0;
       return this.cartDtl.reduce((sum, item) => sum + item.qty, 0);
     },
     totalPrice() {
-      if (!this.cartDtl || this.cartDtl.length === 0) return 0;
       return this.cartDtl.reduce((sum, item) => sum + item.total, 0);
     },
   },
   async mounted() {
-    // ตรวจสอบว่าเป็นเจ้าของตะกร้าหรือไม่
-    this.decodedToken = getCookie();
-    // this.cartId = this.$route.params.cartId;
-    const result = await getCartDtl();
-    this.cart = result.data;
-
-    // Map cartList to cartDtl
-    const cartList = this.cart.cartList;
-    this.cartId = Object.keys(cartList)[0];
-    this.cartDtl = Object.entries(cartList).flatMap(([cartId, cartData]) =>
-      Object.values(cartData.productList).map((product, index) => ({
-        row_number: index + 1,
-        pdId: product.product_id,
-        pdName: product.product_name,
-        price: product.price,
-        qty: product.qty,
-        total: product.price * product.qty, // คำนวณ total เริ่มต้น
-      }))
-    );
+    await this.checkAuthorization();
   },
   methods: {
+    async checkAuthorization() {
+      try {
+        this.memEmail = (await getCookie())?.email; // ดึง email จาก token
+        const result = await getCartDtl();
+        this.cart = result.data;
+
+        // ดึง email เจ้าของตะกร้า (สมมติว่าอยู่ใน result.data.cusId)
+        this.cusId = this.cart.cusId;
+
+        // ตรวจสอบสิทธิ์
+        if (this.memEmail && this.memEmail === this.cusId) {
+          this.isAuthorized = true;
+          this.loadCartData();
+        } else {
+          this.isAuthorized = false;
+        }
+      } catch (error) {
+        console.error("Error checking authorization:", error);
+        this.isAuthorized = false;
+      }
+    },
+    loadCartData() {
+      if (!this.isAuthorized) return;
+      
+      const cartList = this.cart.cartList;
+      this.cartId = Object.keys(cartList)[0];
+      this.cartDtl = Object.entries(cartList).flatMap(([cartId, cartData]) =>
+        Object.values(cartData.productList).map((product, index) => ({
+          row_number: index + 1,
+          pdId: product.product_id,
+          pdName: product.product_name,
+          price: product.price,
+          qty: product.qty,
+          total: product.price * product.qty, 
+        }))
+      );
+    },
     increaseQty(pdId) {
-      // console.log(pdId);
       const product = this.cartDtl.find((item) => item.pdId === pdId);
       if (product) {
         product.qty += 1;
-        // console.log(product.qty);
         product.total = product.price * product.qty;
-        const data = {
-          product_id: product.pdId,
-          qty: product.qty,
-          cart_id: this.cartId,
-        };
-        console.log(data);
-        updateCartItemQty(data);
-        this.updateCart(); // อัปเดทตะกร้าทันที
+        updateCartItemQty({ product_id: product.pdId, qty: product.qty, cart_id: this.cartId });
       }
     },
-
     decreaseQty(pdId) {
-      // console.log(pdId);
       const product = this.cartDtl.find((item) => item.pdId === pdId);
       if (product && product.qty > 1) {
         product.qty -= 1;
-        // console.log(product.qty);
         product.total = product.price * product.qty;
-        const data = {
-          product_id: product.pdId,
-          qty: product.qty,
-          cart_id: this.cartId,
-        };
-        console.log(data);
-        updateCartItemQty(data);
-        this.updateCart(); // อัปเดทตะกร้าทันที
+        updateCartItemQty({ product_id: product.pdId, qty: product.qty, cart_id: this.cartId });
       }
     },
-
-    // ลบสินค้าออกจากตะกร้า
     removeItem(pdId) {
       Swal.fire({
         title: "คุณต้องการลบสินค้านี้หรือไม่?",
@@ -167,32 +145,12 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           this.cartDtl = this.cartDtl.filter((item) => item.pdId !== pdId);
-          const data = {
-            product_id: pdId,
-            cart_id: this.cartId,
-          };
-          delCartItem(data);
-          this.updateCart();
+          delCartItem({ product_id: pdId, cart_id: this.cartId });
           Swal.fire("ลบสำเร็จ!", "สินค้าถูกลบออกจากตะกร้าแล้ว", "success");
         }
       });
     },
-    async updateCart() {
-      try {
-      } catch (error) {
-        console.error("Error updating cart:", error);
-      }
-    },
-    // แปลงรูปแบบวันที่
-    formattedDate(dateStr) {
-      const date = new Date(dateStr);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // เดือนเริ่มต้นที่ 0, จึงต้อง +1
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    },
     removeCart() {
-      // Use SweetAlert for confirmation
       Swal.fire({
         title: "คุณต้องการลบตะกร้าสินค้าหรือไม่?",
         icon: "warning",
@@ -201,23 +159,18 @@ export default {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const data = {
-            cart_id: this.cartId,
-          };
-          console.log(data);
-          const result = await delCart(data);
-          if (result.status === 200) {
+          const res = await delCart({ cart_id: this.cartId });
+          if (res.status === 200) {
             this.cartDtl = [];
             this.cart = [];
             Swal.fire("ลบสำเร็จ!", "ตะกร้าสินค้าของคุณถูกลบแล้ว", "success");
           } else {
-            Swal.fire("ลบไม่สำเร็จ!", result.error, "error");
+            Swal.fire("ลบไม่สำเร็จ!", res.error, "error");
           }
         }
       });
     },
     proceedToBuy() {
-      // Use SweetAlert for confirmation
       Swal.fire({
         title: "คุณต้องการดำเนินการสั่งซื้อหรือไม่?",
         icon: "question",
@@ -226,18 +179,10 @@ export default {
         cancelButtonText: "ยกเลิก",
       }).then((result) => {
         if (result.isConfirmed) {
-          // Simulate successful purchase
-          Swal.fire({
-            title: "ดำเนินการสั่งซื้อสำเร็จ!",
-            icon: "success",
-            confirmButtonText: "ตกลง",
-          });
-        } else {
-          // Optional: Handle cancellation
+          Swal.fire({ title: "ดำเนินการสั่งซื้อสำเร็จ!", icon: "success" });
         }
       });
     },
   },
 };
 </script>
-  <style></style>

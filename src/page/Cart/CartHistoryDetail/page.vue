@@ -1,5 +1,5 @@
 <template>
-  <!-- Master --><!-- ถ้าค่าที่อยู่ใน Cookie กับ CusId ไม่ตรงกันแสดงว่าไม่ใช้ผู้ซื้อไม่มีสิทธิอ่าน -->
+  <!-- Master --><!-- ถ้าค่าที่อยู่ใน Cookie กับ CusId ไม่ตรงกันแสดงว่าไม่ใช่ผู้ซื้อ ไม่มีสิทธิ์อ่าน -->
   <div v-if="memEmail == cusId">
     <div v-for="(ct, cartId) in cart" :key="cartId" class="mt-5">
       <div class="card bg-light">
@@ -58,10 +58,42 @@
 </template>
 
 <script>
+import { getCookie } from "@/functions/Cookie/Cookie.js";
+
 export default {
   name: "CartHistoryDetailPage",
+  data() {
+    return {
+      decodetoken: "",
+      memEmail: "", // ค่า email จาก token
+      cusId: "", // ค่า email ของผู้ซื้อ
+      cart: [], // รายการสินค้าในตะกร้า
+      cartDtl: [], // รายละเอียดสินค้าในตะกร้า
+    };
+  },
+  async mounted() {
+    await this.getToken();
+    if (this.decodetoken === null) {
+      this.$router.push("/login");
+    } else {
+      this.memEmail = this.decodetoken.email; // สมมติว่า token มีค่า email
+    }
+  },
+  methods: {
+    async getToken() {
+      this.decodetoken = await getCookie();
+    },
+    formattedDate(date) {
+      return new Date(date).toLocaleDateString("th-TH", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+  },
 };
 </script>
 
 <style>
+/* เพิ่มสไตล์ถ้าจำเป็น */
 </style>
