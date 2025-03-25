@@ -181,6 +181,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import Swal from "sweetalert2";
 
+import { getCookie } from "@/functions/Cookie/Cookie";
 import {
   AddProduct,
   GetProducts,
@@ -216,7 +217,11 @@ export default {
     const productPriceError = ref(false);
     const fileInputError = ref(false);
 
+    const isAuthorized = ref(false);
+
     onMounted(async () => {
+      // console.log(`Mounted`);
+      authen();
       fetchData();
     });
 
@@ -267,7 +272,26 @@ export default {
 
         console.log(product.value);
       } else {
+        Swal.fire("Error!", "ไม่พบสินค้า", "error").then(() => {
+          router.push({ name: "ManageProductPage" });
+        });
         console.error("Product not found in cache");
+      }
+    };
+
+    const authen = () => {
+      const token = getCookie();
+      console.log(`authen`);
+      if (token) {
+        if (token.roleId === 0) {
+          isAuthorized.value = true;
+        } else {
+          isAuthorized.value = false;
+          router.push({ name: "NotFound" });
+        }
+      } else {
+        isAuthorized.value = false;
+        router.push({ name: "NotFound" });
       }
     };
     // Handle file preview when uploaded via click or drag & drop
@@ -455,6 +479,7 @@ export default {
       fileInputError,
       validateForm,
       fetchData,
+      authen,
       navigateToManageProductPage,
     };
   },

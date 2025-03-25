@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div v-if="this.isAuthorized" class="container">
     <h2 class="pb-3">Manage Product</h2>
     <form @submit.prevent="submitForm">
       <div class="row py-3">
@@ -62,22 +62,43 @@ import { ref, computed } from "vue";
 import ManageProductCard from "./ManageProductCard.vue";
 import { GetProducts } from "@/functions/Product/Product";
 import { GetProductTypes } from "@/functions/MasterData/MasterData";
+import { getCookie } from "@/functions/Cookie/Cookie";
+import NotFound from "@/page/NotFound.vue";
+import router from "@/router";
 
 export default {
   name: "ManageProductPage",
-  components: { ManageProductCard },
+  components: { ManageProductCard, NotFound },
   data() {
     return {
       productTypesData: ref([]),
       originalProducts: ref([]), // เก็บข้อมูลต้นฉบับ
       productName: "",
       productType: "",
+      isAuthorized: false,
+      token: null,
     };
   },
   async mounted() {
     await this.fetchData();
+    this.authen();
   },
   methods: {
+    async authen() {
+      this.token = getCookie();
+      if (this.token) {
+        if (this.token.roleId === 0) {
+          this.isAuthorized = true;
+        } else {
+          this.isAuthorized = false;
+          router.push({ name: "NotFound" });
+        }
+      } else {
+        this.isAuthorized = false;
+        router.push({ name: "NotFound" });
+      }
+    },
+
     async fetchData() {
       try {
         // Fetch product types

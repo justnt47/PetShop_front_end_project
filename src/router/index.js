@@ -82,7 +82,7 @@ const routes = [
             props: true,
           },
           {
-            path: "/edit-product/:id",
+            path: "/Settings/edit-product/:id",
             name: "EditProductPage",
             component: EditProductPage,
             props: true, // Pass product as a prop

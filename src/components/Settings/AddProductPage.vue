@@ -177,7 +177,10 @@
 
 <script>
 import { onMounted, ref } from "vue";
+
 import Swal from "sweetalert2";
+
+import { getCookie } from "@/functions/Cookie/Cookie";
 import { AddProduct } from "@/functions/Product/Product";
 import { GetProductTypes } from "@/functions/MasterData/MasterData";
 import { useRouter } from "vue-router";
@@ -204,7 +207,9 @@ export default {
     const productPriceError = ref(false);
     const fileInputError = ref(false);
 
+    const isAuthorized = ref(false);
     onMounted(async () => {
+      authen();
       const cacheKey = "productTypesCache";
       const cachedData = localStorage.getItem(cacheKey);
 
@@ -222,6 +227,21 @@ export default {
       }
     });
 
+    const authen = () => {
+      const token = getCookie();
+      console.log(`authen`);
+      if (token) {
+        if (token.roleId === 0) {
+          isAuthorized.value = true;
+        } else {
+          isAuthorized.value = false;
+          router.push({ name: "NotFound" });
+        }
+      } else {
+        isAuthorized.value = false;
+        router.push({ name: "NotFound" });
+      }
+    };
     // Handle file preview when uploaded via click or drag & drop
     const previewImage = (event) => {
       const file = event.target.files[0];
@@ -393,6 +413,7 @@ export default {
       fileInputError,
       validateForm,
       navigateToManageProductPage,
+      authen,
     };
   },
 };

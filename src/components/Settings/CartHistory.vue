@@ -1,7 +1,17 @@
 <template>
   <h2 class="pb-3">Cart History</h2>
-
+  <!-- <pre>{{ cartHistoryDetails.cartList }}</pre> -->
   <div
+    v-if="
+      !cartHistoryDetails ||
+      !cartHistoryDetails.cartList ||
+      Object.keys(cartHistoryDetails.cartList).length === 0
+    "
+  >
+    <p>ไม่มีประวัติการซื้อสินค้า</p>
+  </div>
+  <div
+    v-else
     v-for="(cart, cartId) in cartHistoryDetails.cartList"
     :key="cartId"
     class="mb-3"
