@@ -26,4 +26,11 @@ npm run dev
 npm run build
 ```
 
+## Related Repositories
+
+This works together with the other repository to create the complete **Pet Shop** system:
+
+- **Frontend Repository**: [PetShop Frontend](https://github.com/justnt47/PetShop_front_end_project)
+- **Backend Repository**: [PetShop Backend](https://github.com/justnt47/PetShop_Back_end)
+
 This project is for academic purposes only and is not intended for commercial use.
