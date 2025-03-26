@@ -1,16 +1,12 @@
-# Vue_front_end_project
- 
-# shop
+# Pet Shop Frontend (Academic Project)
 
-This template should help get you started developing with Vue 3 in Vite.
+This project is a front-end application for managing a pet shop. It includes features such as product management, cart and order history, user authentication, and profile management. The project is built using **Vue.js** and is designed as an academic exercise to simulate a real-world pet shop system.
 
-## Recommended IDE Setup
+## Tools & Technologies
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+| **Frontend** | Vue 3, Axios |
+| **Backend** | Node.js, Express.js, REST API |
+| **Database** | PostgreSQL |
 
 ## Project Setup
 
@@ -29,3 +25,5 @@ npm run dev
 ```sh
 npm run build
 ```
+
+This project is for academic purposes only and is not intended for commercial use.
